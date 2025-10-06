@@ -2,7 +2,20 @@ import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import { getPineconeClient } from "@/lib/pinecone";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { PineconeStore } from "@langchain/pinecone";
 
+const embeddings = new OpenAIEmbeddings({
+  model: "text-embedding-3-large",
+});
+
+await embeddings.embedQuery("Hello, world!");
+
+// const loader = new PDFLoader("src/document_loaders/example_data/example.pdf");
+
+// const docs = await loader.load();
 const f = createUploadthing();
 
 export const ourFileRouter = {
@@ -42,21 +55,21 @@ export const ourFileRouter = {
       try {
         const response = await fetch(file.ufsUrl);
 
-        // const blob = await response.blob();
+        const blob = await response.blob();
 
-        // const loader = new PDFLoader(blob);
+        const loader = new PDFLoader(blob);
 
-        // const pageLevelDocs = await loader.load();
+        const pageLevelDocs = await loader.load();
 
-        // const pagesAmt = pageLevelDocs.length;
+        const pagesAmt = pageLevelDocs.length;
 
         // const { subscriptionPlan } = metadata;
         // const { isSubscribed } = subscriptionPlan;
 
         // const isProExceeded =
         //   pagesAmt > PLANS.find((plan) => plan.name === "Pro")!.pagesPerPdf;
-        // const isFreeExceeded =
-        //   pagesAmt > PLANS.find((plan) => plan.name === "Free")!.pagesPerPdf;
+        const isFreeExceeded = false;
+        // pagesAmt > PLANS.find((plan) => plan.name === "Free")!.pagesPerPdf;
 
         // if (
         //   (isSubscribed && isProExceeded) ||
@@ -73,38 +86,38 @@ export const ourFileRouter = {
         // }
 
         // // vectorize and index entire document
-        // const pinecone = await getPineconeClient();
-        // const pineconeIndex = pinecone.Index("quill");
+        const pinecone = await getPineconeClient();
+        const pineconeIndex = pinecone.Index("sumupme");
 
-        // const embeddings = new OpenAIEmbeddings({
-        //   openAIApiKey: process.env.OPENAI_API_KEY,
-        // });
+        const embeddings = new OpenAIEmbeddings({
+          openAIApiKey: process.env.OPENAI_API_KEY,
+        });
 
-        // await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
-        //   pineconeIndex,
-        //   namespace: createdFile.id,
-        // });
+        await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
+          pineconeIndex,
+          namespace: createdFile.id,
+        });
 
-        // await db.file.update({
-        //   data: {
-        //     uploadStatus: "SUCCESS",
-        //   },
-        //   where: {
-        //     id: createdFile.id,
-        //   },
-        // });
+        await db.file.update({
+          data: {
+            uploadStatus: "SUCCESS",
+          },
+          where: {
+            id: createdFile.id,
+          },
+        });
       } catch (err) {
-        // await db.file.update({
-        //   data: {
-        //     uploadStatus: "FAILED",
-        //   },
-        //   where: {
-        //     id: createdFile.id,
-        //   },
-        // });
+        await db.file.update({
+          data: {
+            uploadStatus: "FAILED",
+          },
+          where: {
+            id: createdFile.id,
+          },
+        });
       }
     }),
 } satisfies FileRouter;
 
-//4:41:33
+//7:12:33
 export type OurFileRouter = typeof ourFileRouter;
