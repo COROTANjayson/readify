@@ -22,16 +22,16 @@ const ChatInput = ({ isDisabled }: ChatInputProps) => {
             <div className="relative">
               <Textarea
                 rows={1}
-                // ref={textareaRef}
+                ref={textareaRef}
                 maxRows={4}
                 autoFocus
-                // onChange={handleInputChange}
-                // value={message}
+                onChange={handleInputChange}
+                value={message}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
 
-                    // addMessage()
+                    addMessage();
 
                     textareaRef.current?.focus();
                   }
@@ -41,11 +41,11 @@ const ChatInput = ({ isDisabled }: ChatInputProps) => {
               />
 
               <Button
-                // disabled={isLoading || isDisabled}
+                disabled={isLoading || isDisabled}
                 className="absolute bottom-1.5 right-[8px]"
                 aria-label="send message"
                 onClick={() => {
-                  // addMessage()
+                  addMessage();
 
                   textareaRef.current?.focus();
                 }}

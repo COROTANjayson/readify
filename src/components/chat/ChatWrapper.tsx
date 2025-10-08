@@ -10,6 +10,7 @@ import ChatInput from "./ChatInput";
 import { inferRouterOutputs } from "@trpc/server";
 import { AppRouter } from "@/trpc";
 import { UploadStatus } from "@/generated/prisma";
+import { ChatContextProvider } from "./ChatContent";
 // import { ChatContextProvider } from './ChatContext'
 // import { PLANS } from '@/config/stripe'
 
@@ -109,15 +110,15 @@ const ChatWrapper = ({
     );
 
   return (
-    // <ChatContextProvider fileId={fileId}>
-    <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
-      <div className="flex-1 justify-between flex flex-col mb-28">
-        <Messages fileId={fileId} />
-      </div>
+    <ChatContextProvider fileId={fileId}>
+      <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
+        <div className="flex-1 justify-between flex flex-col mb-28">
+          <Messages fileId={fileId} />
+        </div>
 
-      <ChatInput />
-    </div>
-    // </ChatContextProvider>
+        <ChatInput />
+      </div>
+    </ChatContextProvider>
   );
 };
 
