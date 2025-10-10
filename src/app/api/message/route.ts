@@ -1,19 +1,14 @@
-import { db } from "@/db";
-import { openai } from "@/lib/openai";
-import { getPineconeClient } from "@/lib/pinecone";
-import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
-// import { openai } from "@/lib/openai";
-// import { getPineconeClient } from "@/lib/pinecone";
-// import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
+import { NextRequest } from "next/server";
+import { openai as OpenAIStream } from "@ai-sdk/openai"; // or your provider import
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { PineconeStore } from "@langchain/pinecone";
-// import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-// import { PineconeStore } from "langchain/vectorstores/pinecone";
-import { NextRequest } from "next/server";
-
 import { streamText } from "ai";
-import { openai as OpenAIStream } from "@ai-sdk/openai"; // or your provider import
+
+import { db } from "@/db";
+// import { openai } from "@/lib/openai";
+import { getPineconeClient } from "@/lib/pinecone";
+import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
 
 export const POST = async (req: NextRequest) => {
   // endpoint for asking a question to a pdf file
@@ -93,9 +88,7 @@ If you don't know the answer, just say that you don't know.
 
 PREVIOUS CONVERSATION:
 ${formattedPrevMessages
-  .map((m: any) =>
-    m.role === "user" ? `User: ${m.content}` : `Assistant: ${m.content}`
-  )
+  .map((m: any) => (m.role === "user" ? `User: ${m.content}` : `Assistant: ${m.content}`))
   .join("\n")}
 
 ----------------

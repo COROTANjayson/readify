@@ -68,8 +68,8 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
               pageParams: [],
             };
           }
-          let newPages = [...old.pages];
-          let latestPage = newPages[0]!;
+          const newPages = [...old.pages];
+          const latestPage = newPages[0]!;
           latestPage.messages = [
             {
               createdAt: new Date().toISOString(),
@@ -114,10 +114,10 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
           { fileId, limit: INFINITE_QUERY_LIMIT },
           (old) => {
             if (!old) return { pages: [], pageParams: [] };
-            let isAiResponseCreated = old.pages.some((page) =>
+            const isAiResponseCreated = old.pages.some((page) =>
               page.messages.some((message) => message.id === "ai-response")
             );
-            let updatedPages = old.pages.map((page) => {
+            const updatedPages = old.pages.map((page) => {
               if (page === old.pages[0]) {
                 let updatedMessages;
                 if (!isAiResponseCreated) {
