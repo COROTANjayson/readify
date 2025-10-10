@@ -18,6 +18,22 @@ const compat = new FlatCompat({
 export default [
   ...compat.extends("next", "next/core-web-vitals", "prettier"),
   {
+    ignores: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.next/**",
+      "**/.turbo/**",
+      "**/coverage/**",
+      "**/generated/**",
+      "**/proto/**",
+      "**/prisma/**",
+    ],
+  },
+
+  // ✅ Next.js + Prettier base configs
+  ...compat.extends("next", "next/core-web-vitals", "prettier"),
+  {
     plugins: {
       prettier,
     },

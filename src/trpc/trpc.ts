@@ -1,5 +1,6 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
+
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
 // For instance, the use of a t variable
@@ -26,4 +27,4 @@ const isAuth = middleware(async (opts) => {
 // Base router and procedure helpers
 export const router = t.router;
 export const publicProcedure = t.procedure;
-export const privateProcedure = t.procedure.use(isAuth)
+export const privateProcedure = t.procedure.use(isAuth);

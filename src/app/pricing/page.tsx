@@ -1,18 +1,13 @@
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import UpgradeButton from "@/components/UpgradeButton";
-
-import { PLANS } from "@/config/stripe";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { ArrowRight, Check, HelpCircle, Minus } from "lucide-react";
-import Link from "next/link";
+
+import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import { buttonVariants } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import UpgradeButton from "@/components/UpgradeButton";
+import { PLANS } from "@/config/stripe";
+import { cn } from "@/lib/utils";
 
 const Page = async () => {
   const { getUser } = getKindeServerSession();
@@ -79,17 +74,14 @@ const Page = async () => {
         <div className="mx-auto mb-10 sm:max-w-lg">
           <h1 className="text-6xl font-bold sm:text-7xl">Pricing</h1>
           <p className="mt-5 text-gray-600 sm:text-lg">
-            Whether you&apos;re just trying out our service or need more,
-            we&apos;ve got you covered.
+            Whether you&apos;re just trying out our service or need more, we&apos;ve got you covered.
           </p>
         </div>
 
         <div className="pt-12 grid grid-cols-1 gap-10 lg:grid-cols-2">
           <TooltipProvider>
             {pricingItems.map(({ plan, tagline, quota, features }) => {
-              const price =
-                PLANS.find((p) => p.slug === plan.toLowerCase())?.price
-                  .amount || 0;
+              const price = PLANS.find((p) => p.slug === plan.toLowerCase())?.price.amount || 0;
 
               return (
                 <div
@@ -106,13 +98,9 @@ const Page = async () => {
                   )}
 
                   <div className="p-5">
-                    <h3 className="my-3 text-center font-display text-3xl font-bold">
-                      {plan}
-                    </h3>
+                    <h3 className="my-3 text-center font-display text-3xl font-bold">{plan}</h3>
                     <p className="text-gray-500">{tagline}</p>
-                    <p className="my-5 font-display text-6xl font-semibold">
-                      ${price}
-                    </p>
+                    <p className="my-5 font-display text-6xl font-semibold">${price}</p>
                     <p className="text-gray-500">per month</p>
                   </div>
 
@@ -124,9 +112,7 @@ const Page = async () => {
                         <TooltipTrigger className="cursor-default ml-1.5">
                           <HelpCircle className="h-4 w-4 text-zinc-500" />
                         </TooltipTrigger>
-                        <TooltipContent className="w-80 p-2">
-                          How many PDFs you can upload per month.
-                        </TooltipContent>
+                        <TooltipContent className="w-80 p-2">How many PDFs you can upload per month.</TooltipContent>
                       </Tooltip>
                     </div>
                   </div>
@@ -154,9 +140,7 @@ const Page = async () => {
                               <TooltipTrigger className="cursor-default ml-1.5">
                                 <HelpCircle className="h-4 w-4 text-zinc-500" />
                               </TooltipTrigger>
-                              <TooltipContent className="w-80 p-2">
-                                {footnote}
-                              </TooltipContent>
+                              <TooltipContent className="w-80 p-2">{footnote}</TooltipContent>
                             </Tooltip>
                           </div>
                         ) : (

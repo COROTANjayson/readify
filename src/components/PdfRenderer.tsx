@@ -1,35 +1,24 @@
 "use client";
 
-import {
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-  RotateCw,
-  Search,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, RotateCw, Search } from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
-import { useResizeDetector } from "react-resize-detector";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { useState } from "react";
-import SimpleBar from "simplebar-react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useResizeDetector } from "react-resize-detector";
+import SimpleBar from "simplebar-react";
+import { toast } from "sonner";
 import { z } from "zod/v3";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { toast } from "sonner";
 import PdfFullscreen from "./PdfFUllScreen";
+import { Button } from "./ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Input } from "./ui/input";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -43,9 +32,7 @@ const PdfRenderer = ({ url }: { url: string }) => {
   const isLoading = renderedScale !== scale;
 
   const CustomPageValidator = z.object({
-    page: z
-      .string()
-      .refine((num) => Number(num) > 0 && Number(num) <= numPages!),
+    page: z.string().refine((num) => Number(num) > 0 && Number(num) <= numPages!),
   });
 
   type TCustomPageValidator = z.infer<typeof CustomPageValidator>;
@@ -89,10 +76,7 @@ const PdfRenderer = ({ url }: { url: string }) => {
           <div className="flex items-center gap-1.5">
             <Input
               {...register("page")}
-              className={cn(
-                "w-12 h-8",
-                errors.page && "focus-visible:ring-red-500"
-              )}
+              className={cn("w-12 h-8", errors.page && "focus-visible:ring-red-500")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleSubmit(handlePageSubmit)();
@@ -108,9 +92,7 @@ const PdfRenderer = ({ url }: { url: string }) => {
           <Button
             disabled={numPages === undefined || currPage === numPages}
             onClick={() => {
-              setCurrPage((prev) =>
-                prev + 1 > numPages! ? numPages! : prev + 1
-              );
+              setCurrPage((prev) => (prev + 1 > numPages! ? numPages! : prev + 1));
               setValue("page", String(currPage + 1));
             }}
             variant="ghost"
@@ -130,26 +112,14 @@ const PdfRenderer = ({ url }: { url: string }) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onSelect={() => setScale(1)}>
-                100%
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setScale(1.5)}>
-                150%
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setScale(2)}>
-                200%
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setScale(2.5)}>
-                250%
-              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setScale(1)}>100%</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setScale(1.5)}>150%</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setScale(2)}>200%</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setScale(2.5)}>250%</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button
-            onClick={() => setRotation((prev) => prev + 90)}
-            variant="ghost"
-            aria-label="rotate 90 degrees"
-          >
+          <Button onClick={() => setRotation((prev) => prev + 90)} variant="ghost" aria-label="rotate 90 degrees">
             <RotateCw className="h-4 w-4" />
           </Button>
 

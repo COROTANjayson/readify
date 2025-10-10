@@ -1,12 +1,13 @@
-import { z } from "zod/v3";
-import { privateProcedure, publicProcedure, router } from "./trpc";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { TRPCError } from "@trpc/server";
-import { db } from "@/db";
+import { z } from "zod/v3";
+
 import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query";
 import { PLANS } from "@/config/stripe";
-import { absoluteUrl } from "@/lib/utils";
+import { db } from "@/db";
 import { getUserSubscriptionPlan, stripe } from "@/lib/stripe";
+import { absoluteUrl } from "@/lib/utils";
+import { privateProcedure, publicProcedure, router } from "./trpc";
 
 export const appRouter = router({
   hello: publicProcedure
@@ -24,8 +25,7 @@ export const appRouter = router({
     const { getUser } = getKindeServerSession();
     const user = await getUser();
 
-    if (!user || !user.id || !user.email)
-      throw new TRPCError({ code: "UNAUTHORIZED" });
+    if (!user || !user.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
 
     const dbUser = await db.user.findFirst({
       where: {
@@ -103,60 +103,54 @@ export const appRouter = router({
       };
     }),
 
-  getFileUploadStatus: privateProcedure
-    .input(z.object({ fileId: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const file = await db.file.findFirst({
-        where: {
-          id: input.fileId,
-          userId: ctx.userId,
-        },
-      });
+  getFileUploadStatus: privateProcedure.input(z.object({ fileId: z.string() })).query(async ({ input, ctx }) => {
+    const file = await db.file.findFirst({
+      where: {
+        id: input.fileId,
+        userId: ctx.userId,
+      },
+    });
 
-      if (!file) return { status: "PENDING" as const };
+    if (!file) return { status: "PENDING" as const };
 
-      return { status: file.uploadStatus };
-    }),
+    return { status: file.uploadStatus };
+  }),
 
-  getFile: privateProcedure
-    .input(z.object({ key: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const { userId } = ctx;
+  getFile: privateProcedure.input(z.object({ key: z.string() })).mutation(async ({ ctx, input }) => {
+    const { userId } = ctx;
 
-      const file = await db.file.findFirst({
-        where: {
-          key: input.key,
-          userId,
-        },
-      });
+    const file = await db.file.findFirst({
+      where: {
+        key: input.key,
+        userId,
+      },
+    });
 
-      if (!file) throw new TRPCError({ code: "NOT_FOUND" });
+    if (!file) throw new TRPCError({ code: "NOT_FOUND" });
 
-      return file;
-    }),
+    return file;
+  }),
 
-  deleteFile: privateProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const { userId } = ctx;
+  deleteFile: privateProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+    const { userId } = ctx;
 
-      const file = await db.file.findFirst({
-        where: {
-          id: input.id,
-          userId,
-        },
-      });
+    const file = await db.file.findFirst({
+      where: {
+        id: input.id,
+        userId,
+      },
+    });
 
-      if (!file) throw new TRPCError({ code: "NOT_FOUND" });
+    if (!file) throw new TRPCError({ code: "NOT_FOUND" });
 
-      await db.file.delete({
-        where: {
-          id: input.id,
-        },
-      });
+    await db.file.delete({
+      where: {
+        id: input.id,
+      },
+    });
 
-      return file;
-    }),
+    return file;
+  }),
 
   createStripeSession: privateProcedure.mutation(async ({ ctx }) => {
     const { userId } = ctx;

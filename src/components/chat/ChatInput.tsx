@@ -1,7 +1,8 @@
+import { useContext, useRef } from "react";
 import { Send } from "lucide-react";
+
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { useContext, useRef } from "react";
 import { ChatContext } from "./ChatContent";
 
 interface ChatInputProps {
@@ -9,8 +10,7 @@ interface ChatInputProps {
 }
 
 const ChatInput = ({ isDisabled }: ChatInputProps) => {
-  const { addMessage, handleInputChange, isLoading, message } =
-    useContext(ChatContext);
+  const { addMessage, handleInputChange, isLoading, message } = useContext(ChatContext);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

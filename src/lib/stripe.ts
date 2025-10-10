@@ -1,7 +1,8 @@
-import { PLANS } from "@/config/stripe";
-import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import Stripe from "stripe";
+
+import { PLANS } from "@/config/stripe";
+import { db } from "@/db";
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
   apiVersion: "2025-09-30.clover",
@@ -42,15 +43,11 @@ export async function getUserSubscriptionPlan() {
       dbUser.stripeCurrentPeriodEnd.getTime() + 86_400_000 > Date.now()
   );
 
-  const plan = isSubscribed
-    ? PLANS.find((plan) => plan.price.priceIds.test === dbUser.stripePriceId)
-    : null;
+  const plan = isSubscribed ? PLANS.find((plan) => plan.price.priceIds.test === dbUser.stripePriceId) : null;
 
   let isCanceled = false;
   if (isSubscribed && dbUser.stripeSubscriptionId) {
-    const stripePlan = await stripe.subscriptions.retrieve(
-      dbUser.stripeSubscriptionId
-    );
+    const stripePlan = await stripe.subscriptions.retrieve(dbUser.stripeSubscriptionId);
     isCanceled = stripePlan.cancel_at_period_end;
   }
 

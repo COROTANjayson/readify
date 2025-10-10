@@ -1,28 +1,24 @@
 "use client";
 
-import { trpc } from "@/app/_trpc/client";
+import Link from "next/link";
+// import { inferRouterOutputs } from "@trpc/server";
 // import ChatInput from './ChatInput'
 import { ChevronLeft, Loader2, XCircle } from "lucide-react";
-import Link from "next/link";
+
+import { trpc } from "@/app/_trpc/client";
+// import { UploadStatus } from "@/generated/prisma";
+// import { AppRouter } from "@/trpc";
 import { buttonVariants } from "../ui/button";
-import Messages from "./Messages";
-import ChatInput from "./ChatInput";
-import { inferRouterOutputs } from "@trpc/server";
-import { AppRouter } from "@/trpc";
-import { UploadStatus } from "@/generated/prisma";
 import { ChatContextProvider } from "./ChatContent";
+import ChatInput from "./ChatInput";
+import Messages from "./Messages";
+
 // import { ChatContextProvider } from './ChatContext'
 // import { PLANS } from '@/config/stripe'
 
-type RouterOutput = inferRouterOutputs<AppRouter>;
-type FileUploadStatusOutput = RouterOutput["getFileUploadStatus"];
-const ChatWrapper = ({
-  fileId,
-  isSubscribed,
-}: {
-  fileId: string;
-  isSubscribed: boolean;
-}) => {
+// type RouterOutput = inferRouterOutputs<AppRouter>;
+// type FileUploadStatusOutput = RouterOutput["getFileUploadStatus"];
+const ChatWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {
   const { data, isLoading } = trpc.getFileUploadStatus.useQuery(
     {
       fileId,
@@ -47,9 +43,7 @@ const ChatWrapper = ({
           <div className="flex flex-col items-center gap-2">
             <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
             <h3 className="font-semibold text-xl">Loading...</h3>
-            <p className="text-zinc-500 text-sm">
-              We&apos;re preparing your PDF.
-            </p>
+            <p className="text-zinc-500 text-sm">We&apos;re preparing your PDF.</p>
           </div>
         </div>
 
@@ -80,11 +74,7 @@ const ChatWrapper = ({
             <XCircle className="h-8 w-8 text-red-500" />
             <h3 className="font-semibold text-xl">Too many pages in PDF</h3>
             <p className="text-zinc-500 text-sm">
-              Your{" "}
-              <span className="font-medium">
-                {isSubscribed ? "Pro" : "Free"}
-              </span>{" "}
-              plan supports up to{" "}
+              Your <span className="font-medium">{isSubscribed ? "Pro" : "Free"}</span> plan supports up to{" "}
               {/* {isSubscribed
                 ? PLANS.find((p) => p.name === 'Pro')
                     ?.pagesPerPdf

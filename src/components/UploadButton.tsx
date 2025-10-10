@@ -1,20 +1,20 @@
 "use client";
-import { useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { Button } from "./ui/button";
 
-import Dropzone from "react-dropzone";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { DialogTitle } from "@radix-ui/react-dialog";
 import { Cloud, File, Loader2 } from "lucide-react";
+import Dropzone from "react-dropzone";
+import { toast } from "sonner";
+
 // import { Progress } from './ui/progress'
 // import { useUploadThing } from '@/lib/uploadthing'
 // import { useToast } from './ui/use-toast'
 import { trpc } from "@/app/_trpc/client";
-import { useRouter } from "next/navigation";
-import { DialogTitle } from "@radix-ui/react-dialog";
-import { Progress } from "./ui/progress";
-import { resolve } from "path";
 import { useUploadThing } from "@/lib/uploadthing";
-import { toast } from "sonner";
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { Progress } from "./ui/progress";
 
 const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
   const router = useRouter();
@@ -76,7 +76,7 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
         //
       }}
     >
-      {({ getRootProps, getInputProps, isDragActive, acceptedFiles }) => (
+      {({ getRootProps, getInputProps, acceptedFiles }) => (
         <div
           {...getRootProps()}
           className="border h-64 m-4 border-dashed border-gray-300 rounded-lg flex items-center justify-center"
@@ -89,12 +89,9 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
               <div className="flex flex-col items-center justify-center pt-5 pb-6 ">
                 <Cloud className="h-6 w-6 text-zinc-500 mb-2" />
                 <p className="mb-2 text-sm text-zinc-700 ">
-                  <span className="font-semibold">Click to upload</span> or drag
-                  and drop
+                  <span className="font-semibold">Click to upload</span> or drag and drop
                 </p>
-                <p className="text-xs text-zinc-500">
-                  PDF (up to {isSubscribed ? "16" : "4"}MB)
-                </p>
+                <p className="text-xs text-zinc-500">PDF (up to {isSubscribed ? "16" : "4"}MB)</p>
               </div>
 
               {acceptedFiles && acceptedFiles[0] ? (
@@ -102,17 +99,13 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
                   <div className="px-3 py-2 h-full grid place-items-center w-full">
                     <File className="h-4 w-4 text-blue-500" />
                   </div>
-                  <div className="px-3 py-2 h-full text-sm truncate">
-                    {acceptedFiles[0].name}
-                  </div>
+                  <div className="px-3 py-2 h-full text-sm truncate">{acceptedFiles[0].name}</div>
                 </div>
               ) : null}
               {isUploading ? (
                 <div className="w-full mt-4 max-w-xs mx-auto">
                   <Progress
-                    indicatorColor={
-                      uploadProgress === 100 ? "bg-green-500" : ""
-                    }
+                    indicatorColor={uploadProgress === 100 ? "bg-green-500" : ""}
                     value={uploadProgress}
                     className="h-1 w-full bg-zinc-200"
                   />
@@ -124,12 +117,7 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
                   ) : null}
                 </div>
               ) : null}
-              <input
-                {...getInputProps()}
-                type="file"
-                id="dropzone-file"
-                className="hidden"
-              />
+              <input {...getInputProps()} type="file" id="dropzone-file" className="hidden" />
             </label>
           </div>
         </div>
@@ -140,7 +128,7 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
 
 const UploadButton = ({ isSubscribed }: { isSubscribed: boolean }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
+  console.log(isSubscribed);
   return (
     <Dialog
       open={isOpen}
