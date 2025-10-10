@@ -20,10 +20,7 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const { startUpload } = useUploadThing(
-    // isSubscribed ? "proPlanUploader" :
-    "freePlanUploader"
-  );
+  const { startUpload } = useUploadThing(isSubscribed ? "proPlanUploader" : "freePlanUploader");
   const { mutate: startPolling } = trpc.getFile.useMutation({
     onSuccess: (file) => {
       router.push(`/dashboard/${file.id}`);
@@ -128,7 +125,6 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
 
 const UploadButton = ({ isSubscribed }: { isSubscribed: boolean }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  console.log(isSubscribed);
   return (
     <Dialog
       open={isOpen}
@@ -144,7 +140,7 @@ const UploadButton = ({ isSubscribed }: { isSubscribed: boolean }) => {
 
       <DialogContent>
         <DialogTitle className="sr-only"></DialogTitle>
-        <UploadDropzone isSubscribed={true} />
+        <UploadDropzone isSubscribed={isSubscribed} />
       </DialogContent>
     </Dialog>
   );
