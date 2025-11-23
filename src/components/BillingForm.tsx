@@ -15,7 +15,7 @@ interface BillingFormProps {
 }
 
 const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
-  const { mutate: createStripeSession, isPending } = trpc.createStripeSession.useMutation({
+  const { mutate: createStripeSession, isPending } = trpc.billing.createStripeSession.useMutation({
     onSuccess: ({ url }) => {
       if (url) window.location.href = url;
       if (!url) {
