@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ChevronLeft, Loader2, XCircle } from "lucide-react";
 
 import { trpc } from "@/app/_trpc/client";
+import { UploadStatus } from "@/generated/prisma";
 // import { UploadStatus } from "@/generated/prisma";
 // import { AppRouter } from "@/trpc";
 import { buttonVariants } from "../ui/button";
@@ -22,19 +23,15 @@ const ChatWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: b
   const { data, isLoading } = trpc.getFileUploadStatus.useQuery(
     {
       fileId,
+    },
+    {
+      refetchInterval: (query: any) => {
+        const status =
+          query?.state?.data?.status === UploadStatus.SUCCESS || query?.state?.data?.status === "FAILED" ? false : 500;
+        return status;
+      },
     }
-    // {
-    //   refetchInterval: (query) => {
-    //     console.log("refetch interval", query?.state?.status)
-
-    //     const hello = query?.state?.status
-    //     const status =
-    //       query?.state?.status === UploadStatus.SUCCESS || query?.state?.status === "FAILED" ? false : 500;
-    //     return status;
-    //   },
-    // }
   );
-  console.log(data);
 
   if (isLoading)
     return (

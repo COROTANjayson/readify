@@ -15,7 +15,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+    ],
+  },
   /* config options here */
   swcMinify: false,
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {

@@ -3,7 +3,6 @@ import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { PineconeStore } from "@langchain/pinecone";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
 
 import { PLANS } from "@/config/stripe";
 import { db } from "@/db";
@@ -61,7 +60,7 @@ const onUploadComplete = async ({
   });
 
   try {
-    const response = await fetch(`https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`);
+    const response = await fetch(file.ufsUrl);
 
     const blob = await response.blob();
 
@@ -90,7 +89,7 @@ const onUploadComplete = async ({
 
     // vectorize and index entire document
     const pinecone = await getPineconeClient();
-    const pineconeIndex = pinecone.Index("quill");
+    const pineconeIndex = pinecone.Index("summaraize");
 
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
@@ -110,6 +109,7 @@ const onUploadComplete = async ({
       },
     });
   } catch (err) {
+    console.log("erroorrr", err);
     await db.file.update({
       data: {
         uploadStatus: "FAILED",

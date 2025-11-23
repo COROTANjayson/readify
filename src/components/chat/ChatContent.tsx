@@ -89,6 +89,7 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
         previousMessages: previousMessages?.pages.flatMap((page) => page.messages) ?? [],
       };
     },
+
     onSuccess: async (stream) => {
       setIsLoading(false);
       if (!stream) {
@@ -106,6 +107,8 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
         done = doneReading;
         const chunkValue = decoder.decode(value);
         accResponse += chunkValue;
+        console.log("accResponse", accResponse);
+
         // append chunk to the actual message
         utils.getFileMessages.setInfiniteData({ fileId, limit: INFINITE_QUERY_LIMIT }, (old) => {
           if (!old) return { pages: [], pageParams: [] };

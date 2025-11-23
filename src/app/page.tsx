@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MessageSquare, Upload, Zap } from "lucide-react";
 
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { buttonVariants } from "@/components/ui/button";
@@ -8,128 +8,133 @@ import { buttonVariants } from "@/components/ui/button";
 export default function Home() {
   return (
     <>
-      <MaxWidthWrapper className="mb-12 mt-28 sm:mt-40 flex flex-col items-center justify-center text-center">
-        <div className="mx-auto mb-4 flex max-w-fit rounded-2xl items-center justify-center space-x-2 overflow-hidden border border-gray-200 bg-white px-7 py-2 shadow-md backdrop-blur-lg transition-all hover:border-gray-300 hover:bg-white-50">
-          <p className="text-sm font-semibold text-gray">Readify is now public!</p>
-        </div>
-        <h1 className="max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl">
-          Chat with you <span className="text-blue-600">documents</span> in seconds.
-        </h1>
-        <p className="mt-5 max-w-prose text-zinc-700 sm:text-lg">
-          Readify allows you to have conmversations with any PDF document. Simply upload you file and start asking
-          questions right away.
-        </p>
-
-        <Link
-          className={buttonVariants({
-            size: "lg",
-            className: "mt-5",
-          })}
-          href={"/dashboard"}
-          target="_blank"
-        >
-          Get Started <ArrowRight className="ml-2 h-5 w-5" />
-        </Link>
-      </MaxWidthWrapper>
-      {/* value propostion section */}
-      <div>
-        <div className="relative isolate">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-30"
-          >
-            <div
-              style={{
-                clipPath:
-                  "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-              }}
-              className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1877rem]"
-            />
-          </div>
-          <div>
-            <div className="mx-auto max-w-6xl">
-              <div className="mt-16 flow-root sm:mt-24">
-                <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
-                  <Image
-                    src="/dashboard-preview.jpg"
-                    alt="product preview"
-                    width={1364}
-                    height={866}
-                    quality={100}
-                    className="rounded-md bg-white p-2 sm:p-8 md:p-20 shadow-2xl ring-1 ring-gray-900/10"
-                  />
-                </div>
-              </div>
+      <MaxWidthWrapper className="mb-12 mt-28 sm:mt-40">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12">
+          {/* Text Content */}
+          <div className="flex flex-col items-center justify-center text-center lg:flex-1 lg:items-start lg:text-left">
+            <h1
+              className="mx-auto lg:mx-0 max-w-4xl font-semibold leading-tight 
+  text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground/90"
+            >
+              Instantly summarize and explore your{" "}
+              <span className="bg-gradient-to-r from-primary/90 to-primary/60 bg-clip-text text-transparent">
+                documents
+              </span>
+              .
+            </h1>
+            <p className="mt-6 max-w-2xl mx-auto lg:mx-0 text-base sm:text-lg leading-relaxed text-muted-foreground">
+              SummarAIze helps you quickly understand any PDF — simply upload your document, and start exploring or
+              asking questions in seconds.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+              <Link
+                className={buttonVariants({
+                  size: "lg",
+                  className: "shadow-lg hover:shadow-xl transition-all",
+                })}
+                href="/dashboard"
+              >
+                Get Started <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+              <Link
+                className={buttonVariants({
+                  size: "lg",
+                  variant: "outline",
+                  className: "shadow-sm hover:shadow-md transition-all",
+                })}
+                href="#features"
+              >
+                Learn More
+              </Link>
             </div>
           </div>
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-30"
-          >
-            <div
-              style={{
-                clipPath:
-                  "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-              }}
-              className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-36rem)] sm:w-[72.1877rem]"
-            />
+
+          {/* Image - Shows below on mobile, right side on desktop */}
+          <div className="mt-16 lg:mt-0 lg:flex-1">
+            <div className="-m-2 rounded-xl bg-gradient-to-br from-primary/5 to-secondary/5 p-2 ring-1 ring-inset ring-primary/10 lg:-m-4 lg:rounded-2xl lg:p-4 shadow-2xl hover:shadow-3xl transition-all duration-300">
+              <Image
+                src="/dashboard-preview.jpg"
+                alt="product preview"
+                width={1364}
+                height={866}
+                quality={100}
+                className="rounded-md bg-background p-2 sm:p-8 md:p-20 shadow-2xl ring-1 ring-border/50"
+              />
+            </div>
           </div>
         </div>
-      </div>
-      {/* Feature Section */}
+      </MaxWidthWrapper>
 
-      <div className="mx-auto mb-32 mt-32 max-w-5xl sm:mt-56">
+
+      <div id="features" className="mx-auto mb-32 mt-32 max-w-5xl sm:mt-56">
         <div className="mb-12 px-6 lg:px-8">
           <div className="mx-auto max-w-2xl sm:text-center">
-            <h2 className="mt-2 font-bold text-4xl text-gray-900 sm:text-5xl">Start chatting in minutes</h2>
-            <p className="mt-4 text-lg text-gray-600">Chatting to you PDF files has never been easier that Readify</p>
+            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary mb-4">
+              <Zap className="mr-2 h-4 w-4" />
+              Quick Setup
+            </div>
+            <h2 className="mt-2 font-bold text-4xl text-foreground sm:text-5xl">Get started in minutes</h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Summarizing and exploring your PDF files has never been simpler with SummarAIze.
+            </p>
           </div>
 
           {/* Steps */}
           <ol className="my-8 space-y-4 pt-8 md:flex md:space-x-12 md:space-y-0">
-            <li className="md:flx-1">
-              <div className="flex flex-col space-y-2 border-l-4 border-zinc-300 py-2 pl-4 md:border-l-0 md:border-t-2 md:pb-0 md:pt-4">
-                <span className="text-sm font-medium text-blue-600">Step 1</span>
-                <span className="text-xl font semi-bold">Sign up for an account</span>
-                <span className="mt-2 text-zinc-700">
-                  Either starting out with a free plan or choose our
-                  <Link href={"/pricing"} className="text-blue-700 underline underline-offset-3">
-                    pro plan
-                  </Link>
-                  .
+            <li className="md:flex-1">
+              <div className="flex flex-col space-y-2 border-l-4 border-primary/30 py-2 pl-4 md:border-l-0 md:border-t-2 md:pb-0 md:pt-4 hover:border-primary transition-colors group">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    1
+                  </div>
+                  <span className="text-sm font-medium text-primary">Step 1</span>
+                </div>
+                <span className="text-xl font-semibold text-foreground">Sign up for an account</span>
+                <span className="mt-2 text-muted-foreground">
+                  Get started for free and experience effortless document summarization.
                 </span>
               </div>
             </li>
-            <li className="md:flx-1">
-              <div className="flex flex-col space-y-2 border-l-4 border-zinc-300 py-2 pl-4 md:border-l-0 md:border-t-2 md:pb-0 md:pt-4">
-                <span className="text-sm font-medium text-blue-600">Step 2</span>
-                <span className="text-xl font semi-bold">Upload you PDF file</span>
-                <span className="mt-2 text-zinc-700">
-                  We&apos;ll process your file and make it ready for you to chat with.
+            <li className="md:flex-1">
+              <div className="flex flex-col space-y-2 border-l-4 border-primary/30 py-2 pl-4 md:border-l-0 md:border-t-2 md:pb-0 md:pt-4 hover:border-primary transition-colors group">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <Upload className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-medium text-primary">Step 2</span>
+                </div>
+                <span className="text-xl font-semibold text-foreground">Upload your PDF file</span>
+                <span className="mt-2 text-muted-foreground">
+                  Your document will be ready to summarize and chat with in seconds.
                 </span>
               </div>
             </li>
-            <li className="md:flx-1">
-              <div className="flex flex-col space-y-2 border-l-4 border-zinc-300 py-2 pl-4 md:border-l-0 md:border-t-2 md:pb-0 md:pt-4">
-                <span className="text-sm font-medium text-blue-600">Step 2</span>
-                <span className="text-xl font semi-bold">Start asking question</span>
-                <span className="mt-2 text-zinc-700">
-                  It&apos;s that simple. Try out Readify today - it really takes less than a minute.
+            <li className="md:flex-1">
+              <div className="flex flex-col space-y-2 border-l-4 border-primary/30 py-2 pl-4 md:border-l-0 md:border-t-2 md:pb-0 md:pt-4 hover:border-primary transition-colors group">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <MessageSquare className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-medium text-primary">Step 3</span>
+                </div>
+                <span className="text-xl font-semibold text-foreground">Discover more in your PDFs</span>
+                <span className="mt-2 text-muted-foreground">
+                  Upload a document and uncover summaries, insights, and answers instantly.
                 </span>
               </div>
             </li>
           </ol>
 
-          <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-6xl px-6 lg:px-8">
             <div className="mt-16 flow-root sm:mt-24">
-              <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
+              <div className="-m-2 rounded-xl bg-gradient-to-br from-primary/5 to-secondary/5 p-2 ring-1 ring-inset ring-primary/10 lg:-m-4 lg:rounded-2xl lg:p-4 shadow-2xl hover:shadow-3xl transition-all duration-300">
                 <Image
                   src="/file-upload-preview.jpg"
                   alt="uploading preview"
                   width={1419}
                   height={732}
                   quality={100}
-                  className="rounded-md bg-white p-2 sm:p-8 md:p-20 shadow-2xl ring-1 ring-gray-900/10"
+                  className="rounded-md bg-background p-2 sm:p-8 md:p-20 shadow-2xl ring-1 ring-border/50"
                 />
               </div>
             </div>

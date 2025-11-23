@@ -1,20 +1,17 @@
 import { NextRequest } from "next/server";
-import { openai as OpenAIStream } from "@ai-sdk/openai"; // or your provider import
+import { openai as OpenAIStream } from "@ai-sdk/openai";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { PineconeStore } from "@langchain/pinecone";
 import { streamText } from "ai";
 
 import { db } from "@/db";
-// import { openai } from "@/lib/openai";
 import { getPineconeClient } from "@/lib/pinecone";
 import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
 
 export const POST = async (req: NextRequest) => {
   // endpoint for asking a question to a pdf file
-
   const body = await req.json();
-
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
@@ -48,7 +45,7 @@ export const POST = async (req: NextRequest) => {
   });
 
   const pinecone = await getPineconeClient();
-  const pineconeIndex = pinecone.Index("quill");
+  const pineconeIndex = pinecone.Index("summaraize");
 
   const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
     pineconeIndex,
@@ -82,22 +79,22 @@ export const POST = async (req: NextRequest) => {
       {
         role: "user",
         content: `Use the following pieces of context (or previous conversation if needed) to answer the user's question in markdown format.
-If you don't know the answer, just say that you don't know.
+          If you don't know the answer, just say that you don't know.
 
-----------------
+          ----------------
 
-PREVIOUS CONVERSATION:
-${formattedPrevMessages
-  .map((m: any) => (m.role === "user" ? `User: ${m.content}` : `Assistant: ${m.content}`))
-  .join("\n")}
+          PREVIOUS CONVERSATION:
+          ${formattedPrevMessages
+            .map((m: any) => (m.role === "user" ? `User: ${m.content}` : `Assistant: ${m.content}`))
+            .join("\n")}
 
-----------------
+          ----------------
 
-CONTEXT:
-${results.map((r: any) => r.pageContent).join("\n\n")}
+          CONTEXT:
+          ${results.map((r: any) => r.pageContent).join("\n\n")}
 
-USER INPUT: ${message}
-`,
+          USER INPUT: ${message}
+          `,
       },
     ],
 
