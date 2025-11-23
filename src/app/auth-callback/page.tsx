@@ -13,7 +13,7 @@ const Page = () => {
   const origin = searchParams.get("origin");
 
   //   const { data } = trpc.hello.useQuery({ text: "jayspon" });
-  const { data, isError, error } = trpc.authCallBack.useQuery(undefined, {
+  const { data, isError, error } = trpc.auth.authCallBack.useQuery(undefined, {
     retry: true,
     retryDelay: 500,
   });

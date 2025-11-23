@@ -20,7 +20,7 @@ import Messages from "./Messages";
 // type RouterOutput = inferRouterOutputs<AppRouter>;
 // type FileUploadStatusOutput = RouterOutput["getFileUploadStatus"];
 const ChatWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {
-  const { data, isLoading } = trpc.getFileUploadStatus.useQuery(
+  const { data, isLoading } = trpc.file.getFileUploadStatus.useQuery(
     {
       fileId,
     },

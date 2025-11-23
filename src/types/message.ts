@@ -1,11 +1,11 @@
 import { JSX } from "react";
 import { inferRouterOutputs } from "@trpc/server";
 
-import { AppRouter } from "@/trpc";
+import { AppRouter } from "@/trpc/routers";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 
-type Messages = RouterOutput["getFileMessages"]["messages"];
+type Messages = RouterOutput["message"]["getFileMessages"]["messages"];
 
 type OmitText = Omit<Messages[number], "text">;
 

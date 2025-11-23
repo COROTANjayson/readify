@@ -56,11 +56,11 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
       backupMessage.current = message;
       setMessage("");
       // step 1
-      await utils.getFileMessages.cancel();
+      await utils.message.getFileMessages.cancel();
       // step 2
-      const previousMessages = utils.getFileMessages.getInfiniteData();
+      const previousMessages = utils.message.getFileMessages.getInfiniteData();
       // step 3
-      utils.getFileMessages.setInfiniteData({ fileId, limit: INFINITE_QUERY_LIMIT }, (old) => {
+      utils.message.getFileMessages.setInfiniteData({ fileId, limit: INFINITE_QUERY_LIMIT }, (old) => {
         if (!old) {
           return {
             pages: [],
@@ -107,10 +107,9 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
         done = doneReading;
         const chunkValue = decoder.decode(value);
         accResponse += chunkValue;
-        console.log("accResponse", accResponse);
 
         // append chunk to the actual message
-        utils.getFileMessages.setInfiniteData({ fileId, limit: INFINITE_QUERY_LIMIT }, (old) => {
+        utils.message.getFileMessages.setInfiniteData({ fileId, limit: INFINITE_QUERY_LIMIT }, (old) => {
           if (!old) return { pages: [], pageParams: [] };
           const isAiResponseCreated = old.pages.some((page) =>
             page.messages.some((message) => message.id === "ai-response")
@@ -152,11 +151,11 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
     },
     onError: (_, __, context) => {
       setMessage(backupMessage.current);
-      utils.getFileMessages.setData({ fileId }, { messages: context?.previousMessages ?? [] });
+      utils.message.getFileMessages.setData({ fileId }, { messages: context?.previousMessages ?? [] });
     },
     onSettled: async () => {
       setIsLoading(false);
-      await utils.getFileMessages.invalidate({ fileId });
+      await utils.message.getFileMessages.invalidate({ fileId });
     },
   });
 
