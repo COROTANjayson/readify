@@ -3,12 +3,12 @@ import { getKindeServerSession, LoginLink, RegisterLink } from "@kinde-oss/kinde
 import { ArrowRight } from "lucide-react";
 
 import MaxWidthWrapper from "./MaxWidthWrapper";
-import { buttonVariants } from "./ui/button";
 import MobileNav from "./MobileNav";
+import { buttonVariants } from "./ui/button";
 import UserAccountNav from "./UserAccountNav";
 
 const Navbar = async () => {
-  const { getUser } =  getKindeServerSession();
+  const { getUser } = getKindeServerSession();
   const user = await getUser();
 
   return (

@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { trpc } from "@/app/_trpc/client";
 import { useUploadThing } from "@/lib/uploadthing";
 import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTrigger } from "./ui/dialog";
 import { Progress } from "./ui/progress";
 
 const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
@@ -139,6 +139,8 @@ const UploadButton = ({ isSubscribed }: { isSubscribed: boolean }) => {
       </DialogTrigger>
 
       <DialogContent>
+        <DialogDescription className="sr-only">Upload a file using the dropzone below.</DialogDescription>
+
         <DialogTitle className="sr-only"></DialogTitle>
         <UploadDropzone isSubscribed={isSubscribed} />
       </DialogContent>

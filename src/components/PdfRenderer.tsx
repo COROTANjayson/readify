@@ -160,6 +160,8 @@ const PdfRenderer = ({ url }: { url: string }) => {
                 scale={scale}
                 rotate={rotation}
                 key={"@" + scale}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
                 loading={
                   <div className="flex justify-center">
                     <Loader2 className="my-24 h-6 w-6 animate-spin" />

@@ -40,11 +40,10 @@ export function constructMetadata({
       title,
       description,
       images: [image],
-      creator: "@joshtriedcoding",
+      creator: "@jysncrtn",
     },
     icons,
-    metadataBase: new URL("https://sumupme.vercel.app"),
-    themeColor: "#FFF",
+    metadataBase: new URL("https://summaraize.vercel.app"),
     ...(noIndex && {
       robots: {
         index: false,
