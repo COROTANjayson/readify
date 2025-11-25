@@ -9,6 +9,8 @@ import DocxEditorPage from "@/components/doc/DocxEditor";
 import PDFWrapper from "@/components/PdfWrapper";
 // import PdfRenderer from "@/components/PdfRenderer";
 import { db } from "@/db";
+import DocxEditorWithPlate from "@/components/doc/DocxEditorWithPlate";
+import MyEditorPage from "@/components/doc/PlateDocxEditor";
 
 interface PageProps {
   params: {
@@ -26,7 +28,7 @@ const Page = async ({ params }: PageProps) => {
   if (!user || !user.id) redirect(`/auth-callback?origin=dashboard/${fileid}`);
 
   //   const plan = await getUserSubscriptionPlan();
-  return <DocxEditorPage />;
+  return <MyEditorPage />;
 };
 
 export default Page;
