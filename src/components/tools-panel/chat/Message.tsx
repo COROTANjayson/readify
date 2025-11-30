@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 
 import { cn } from "@/lib/utils";
 import { ExtendedMessage } from "@/types/message";
-import { Icons } from "../Icons";
+import { Icons } from "@/components/Icons";
 
 interface MessageProps {
   message: ExtendedMessage;
