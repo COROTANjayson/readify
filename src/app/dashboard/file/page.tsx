@@ -1,12 +1,9 @@
 // import ChatWrapper from '@/components/chat/ChatWrapper'
 // import PdfRenderer from '@/components/PdfRenderer'
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 // import { getUserSubscriptionPlan } from '@/lib/stripe'
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
-import PDFWrapper from "@/components/PdfWrapper";
-import DocxEditorPage from "@/components/tools-panel/doc/DocxEditor";
-import DocxEditorWithPlate from "@/components/tools-panel/doc/DocxEditorWithPlate";
 import MyEditorPage from "@/components/tools-panel/doc/PlateDocxEditor";
 // import AppHello from "@/components/tools-panel/test";
 // import PdfRenderer from "@/components/PdfRenderer";

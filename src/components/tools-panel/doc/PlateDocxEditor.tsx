@@ -20,6 +20,7 @@ import {
 import * as mammoth from "mammoth";
 import type { Value } from "platejs";
 import { Plate, usePlateEditor } from "platejs/react";
+import { serializeHtml } from "platejs/static";
 
 import { BlockquoteElement } from "@/components/ui/blockquote-node";
 import { Editor, EditorContainer } from "@/components/ui/editor";
@@ -29,9 +30,11 @@ import { BulletedListElement, NumberedListElement } from "@/components/ui/list-c
 import { MarkToolbarButton } from "@/components/ui/mark-toolbar-button";
 import { ToolbarButton } from "@/components/ui/toolbar";
 import { htmlToPlateValue } from "@/lib/docx";
+import htmlDocx from "html-docx-js/dist/html-docx";
 
 export default function MyEditorPage() {
-  const [loadedValue, setLoadedValue] = useState<Value | null>(null);
+  // const [loadedValue, setLoadedValue] = useState<Value | null>(null);
+  const [loadedValue, setLoadedValue] = useState<string | Value | null>(null);
 
   // Load DOCX on mount
   useEffect(() => {
@@ -45,9 +48,10 @@ export default function MyEditorPage() {
         const arrayBuffer = await response.arrayBuffer();
         const result = await mammoth.convertToHtml({ arrayBuffer });
         const plateValue = htmlToPlateValue(result.value);
-        console.log(result);
+
+        console.log("result", result.value);
         console.log("Loaded value:", plateValue);
-        setLoadedValue(plateValue);
+        setLoadedValue(result.value);
       } catch (error) {
         console.error("Error loading DOCX:", error);
         setLoadedValue([
@@ -72,9 +76,10 @@ export default function MyEditorPage() {
 }
 
 // Separate component that receives the loaded data
-function EditorWithData({ initialValue }: { initialValue: Value }) {
+function EditorWithData({ initialValue }: { initialValue: string | Value }) {
   const editor = usePlateEditor({
     plugins: [
+      // BasicNodesPlugin,
       BoldPlugin,
       ItalicPlugin,
       UnderlinePlugin,
@@ -95,6 +100,25 @@ function EditorWithData({ initialValue }: { initialValue: Value }) {
     ],
     value: initialValue,
   });
+  // useEffect(()=>{
+
+  // })
+  // Convert Plate value -> HTML -> DOCX -> Download
+  const exportToDocx = async () => {
+    // const html = editor.getHtml(); // Plate built-in HTML serializer
+    const html = await serializeHtml(editor);
+    console.log(html);
+    const docxBlob = htmlDocx.asBlob(html, {
+      orientation: "portrait",
+    });
+
+    const url = window.URL.createObjectURL(docxBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "document.docx";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
     <Plate editor={editor}>
@@ -114,6 +138,7 @@ function EditorWithData({ initialValue }: { initialValue: Value }) {
         <MarkToolbarButton nodeType="underline" tooltip="Underline (⌘+U)">
           U
         </MarkToolbarButton>
+        <ToolbarButton onClick={exportToDocx}>Export</ToolbarButton>
       </FixedToolbar>
       <EditorContainer>
         <Editor placeholder="Type your amazing content here..." />
