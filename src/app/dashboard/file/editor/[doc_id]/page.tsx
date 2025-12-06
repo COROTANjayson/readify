@@ -11,21 +11,21 @@ import { db } from "@/db";
 
 interface PageProps {
   params: {
-    fileid: string;
+    doc_id: string;
   };
 }
 
 const Page = async ({ params }: PageProps) => {
   const resolved = await params;
-  const { fileid } = resolved;
+  const { doc_id } = resolved;
 
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
-  if (!user || !user.id) redirect(`/auth-callback?origin=dashboard/${fileid}`);
+  //   if (!user || !user.id) redirect(`/auth-callback?origin=dashboard/${fileid}`);
 
   //   const plan = await getUserSubscriptionPlan();
-  return <MyEditorPage />;
+  return <MyEditorPage doc_id={doc_id} />;
   // return <AppHello />;
 };
 
