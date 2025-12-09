@@ -4,10 +4,11 @@ import { redirect } from "next/navigation";
 // import { getUserSubscriptionPlan } from '@/lib/stripe'
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
-import MyEditorPage from "@/components/tools-panel/doc/PlateDocxEditor";
 // import AppHello from "@/components/tools-panel/test";
 // import PdfRenderer from "@/components/PdfRenderer";
 import { db } from "@/db";
+// import MyEditorPage from "@/components/editor/PlateDocxEditor";
+import MyEditorPage from "@/components/editor/EditorPage";
 
 interface PageProps {
   params: {
@@ -22,9 +23,8 @@ const Page = async ({ params }: PageProps) => {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
-  //   if (!user || !user.id) redirect(`/auth-callback?origin=dashboard/${fileid}`);
+  if (!user || !user.id) redirect(`/auth-callback?origin=dashboard`);
 
-  //   const plan = await getUserSubscriptionPlan();
   return <MyEditorPage doc_id={doc_id} />;
   // return <AppHello />;
 };

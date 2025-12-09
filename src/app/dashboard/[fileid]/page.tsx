@@ -1,13 +1,8 @@
-// import ChatWrapper from '@/components/chat/ChatWrapper'
-// import PdfRenderer from '@/components/PdfRenderer'
 import { notFound, redirect } from "next/navigation";
-// import { getUserSubscriptionPlan } from '@/lib/stripe'
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
-import ChatWrapper from "@/components/chat/ChatWrapper";
 import PDFWrapper from "@/components/PdfWrapper";
 import ToolsWrapper from "@/components/tools-panel/ToolsWrapper";
-// import PdfRenderer from "@/components/PdfRenderer";
 import { db } from "@/db";
 
 interface PageProps {
