@@ -21,12 +21,6 @@ export const tools: Feature[] = [
     description: "Get a summary of the content",
   },
   {
-    id: "docx",
-    name: "Convert to DOCX",
-    icon: <FileText className="w-5 h-5" />,
-    description: "Export as Word document",
-  },
-  {
     id: "ppt",
     name: "Create PPT",
     icon: <Presentation className="w-5 h-5" />,

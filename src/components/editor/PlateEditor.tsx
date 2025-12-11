@@ -36,7 +36,13 @@ import { MarkToolbarButton } from "@/components/ui/mark-toolbar-button";
 import { ToolbarButton } from "@/components/ui/toolbar";
 
 // Separate component that receives the loaded data
-export function PlateEditor({ initialValue }: { initialValue: string | Value }) {
+export function PlateEditor({
+  initialValue,
+  onValueChange,
+}: {
+  initialValue: string | Value;
+  onValueChange?: (value: string | Value) => void;
+}) {
   const editor = usePlateEditor({
     plugins: [
       // BasicNodesPlugin,
@@ -75,7 +81,13 @@ export function PlateEditor({ initialValue }: { initialValue: string | Value }) 
   };
 
   return (
-    <Plate editor={editor}>
+    <Plate
+      onChange={async ({ value }) => {
+        const html = await serializeHtml(editor);
+        onValueChange?.(html);
+      }}
+      editor={editor}
+    >
       <FixedToolbar className="flex justify-start gap-1 rounded-t-lg">
         <ToolbarButton onClick={() => editor.tf.h1.toggle()}>H1</ToolbarButton>
         <ToolbarButton onClick={() => editor.tf.h2.toggle()}>H2</ToolbarButton>

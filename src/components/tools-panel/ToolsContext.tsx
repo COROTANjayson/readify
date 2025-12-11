@@ -23,7 +23,7 @@ interface Props {
 
 export const ToolsContextProvider = ({ children }: Props) => {
   const [selectedTools, setSelectedTools] = useState<string>("chat");
-  const [isToolsMenuOpen, setIsToolsMenuOpen] = useState<boolean>(true);
+  const [isToolsMenuOpen, setIsToolsMenuOpen] = useState<boolean>(false);
 
   const handleToolsSelect = (toolsId: string) => {
     setSelectedTools(toolsId);
