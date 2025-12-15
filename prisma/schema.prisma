@@ -51,6 +51,7 @@ model File {
   User            User?            @relation(fields: [userId], references: [id])
   userId          String?
   documentSummary DocumentSummary?
+  documentInsight DocumentInsight?
 }
 
 model Message {
@@ -77,7 +78,26 @@ model DocumentSummary {
   User   User?   @relation(fields: [userId], references: [id])
   userId String?
   File   File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  fileId String  @unique // Each file should have only one summary
+  fileId String  @unique 
+
+  @@index([userId])
+  @@index([fileId])
+}
+
+model DocumentInsight {
+  id          String   @id @default(cuid())
+  insight     String   @db.Text
+  keyFindings String[] @default([])
+  actionItems String[] @default([])
+  questions   String[] @default([])
+
+  userId String
+  fileId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([fileId])
