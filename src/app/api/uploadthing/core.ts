@@ -13,14 +13,27 @@ const embeddings = new OpenAIEmbeddings({
   model: "text-embedding-3-large",
 });
 
-//for generating docs
-//https://chatgpt.com/c/69230341-7544-8324-8973-2ed155a6d90a
 await embeddings.embedQuery("Hello, world!");
 
-// const loader = new PDFLoader("src/document_loaders/example_data/example.pdf");
-
-// const docs = await loader.load();
 const f = createUploadthing();
+
+// Helper function to get default limits based on subscription
+const getDefaultLimits = (isSubscribed: boolean) => {
+  return isSubscribed
+    ? {
+        chatLimit: 999999, // unlimited for pro
+        summarizeLimit: 5,
+        insightLimit: 5,
+        presentationLimit: 5,
+      }
+    : {
+        chatLimit: 10,
+        summarizeLimit: 2,
+        insightLimit: 3,
+        presentationLimit: 2,
+      };
+};
+
 const middleware = async () => {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
@@ -28,6 +41,20 @@ const middleware = async () => {
   if (!user || !user.id) throw new Error("Unauthorized");
 
   const subscriptionPlan = await getUserSubscriptionPlan();
+
+  // Check upload file limit for free users
+  if (!subscriptionPlan.isSubscribed) {
+    const activeFileCount = await db.file.count({
+      where: {
+        userId: user.id,
+        deletedAt: null, // only count non-deleted files
+      },
+    });
+
+    if (activeFileCount >= 3) {
+      throw new Error("Upload limit reached. Free users can upload up to 3 files.");
+    }
+  }
 
   return { subscriptionPlan, userId: user.id };
 };
@@ -51,6 +78,12 @@ const onUploadComplete = async ({
 
   if (isFileExist) return;
 
+  const { subscriptionPlan } = metadata;
+  const { isSubscribed } = subscriptionPlan;
+
+  // Get default limits based on subscription
+  const limits = getDefaultLimits(isSubscribed);
+
   const createdFile = await db.file.create({
     data: {
       key: file.key,
@@ -58,6 +91,8 @@ const onUploadComplete = async ({
       userId: metadata.userId,
       url: file.ufsUrl,
       uploadStatus: "PROCESSING",
+      // Set per-file limits based on subscription
+      ...limits,
     },
   });
 
@@ -72,9 +107,6 @@ const onUploadComplete = async ({
 
     const pagesAmt = pageLevelDocs.length;
 
-    const { subscriptionPlan } = metadata;
-    const { isSubscribed } = subscriptionPlan;
-
     const isProExceeded = pagesAmt > PLANS.find((plan) => plan.name === "Pro")!.pagesPerPdf;
     const isFreeExceeded = pagesAmt > PLANS.find((plan) => plan.name === "Free")!.pagesPerPdf;
 
@@ -87,6 +119,7 @@ const onUploadComplete = async ({
           id: createdFile.id,
         },
       });
+      return;
     }
 
     // vectorize and index entire document

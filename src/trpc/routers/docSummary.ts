@@ -49,22 +49,15 @@ export const docSummaryRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const summary = await db.documentSummary.findUnique({
-        where: {
-          fileId: input.fileId,
-        },
-        include: {
-          File: true,
-        },
+        where: { fileId: input.fileId },
+        include: { File: true },
       });
 
+      // ✅ NOT FOUND = valid state
       if (!summary) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Document summary not found for this file",
-        });
+        return null;
       }
 
-      // Verify ownership
       if (summary.userId !== ctx.userId) {
         throw new TRPCError({
           code: "FORBIDDEN",

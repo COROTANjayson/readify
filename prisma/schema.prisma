@@ -43,17 +43,35 @@ model File {
 
   uploadStatus UploadStatus @default(PENDING)
 
-  url      String
-  key      String
-  messages Message[]
+  url String
+  key String
 
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  User            User?            @relation(fields: [userId], references: [id])
-  userId          String?
+  // Per-file usage limits
+  chatLimit         Int @default(10) // FREE: 10, PRO: unlimited (999999)
+  summarizeLimit    Int @default(2) // FREE: 2, PRO: 5
+  insightLimit      Int @default(3) // FREE: 3, PRO: 5
+  presentationLimit Int @default(2) // FREE: 2, PRO: 5
+
+  // Current usage counters
+  chatCount         Int @default(0)
+  summarizeCount    Int @default(0)
+  insightCount      Int @default(0)
+  presentationCount Int @default(0)
+
+  messages        Message[]
   documentSummary DocumentSummary?
   documentInsight DocumentInsight?
   presentations   Presentation[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft delete - doesn't reset limits on other files
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@index([userId])
+  @@index([userId, deletedAt])
 }
 
 model Message {

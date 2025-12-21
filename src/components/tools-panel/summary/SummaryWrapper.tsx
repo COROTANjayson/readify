@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Eye, FileText, Loader2, RefreshCw } from "lucide-react";
 
 import { trpc } from "@/app/_trpc/client";
+import { useFileStore } from "@/app/store/fileStore";
 import { Button } from "@/components/ui/button";
 
 interface SummaryResponse {
@@ -19,41 +20,25 @@ interface SummaryResponse {
 }
 
 const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {
-  console.log(isSubscribed);
+  console.log(isSubscribed)
   const router = useRouter();
   const [regenerate, setRegenerate] = useState(false);
-  // error.data?.code === "NOT_FOUND"
-  // Check if summary already exists for this file
+
+  const { currentFile, canSummarize, increment } = useFileStore();
+
+  // Check if summary already exists
   const {
     data: existingSummary,
     isLoading: isCheckingExisting,
     refetch: refetchSummary,
-    // error,
-  } = trpc.docSummary.getDocSummaryByFileId.useQuery(
-    { fileId },
-    {
-      retry: false,
-      // Don't treat 404 as error since it's expected when no summary exists
-      // onError: (error) => {
-      //   // Only log non-404 errors
-      //   if (!error.message.includes("not found")) {
-      //     console.error("Error checking existing summary:", error);
-      //   }
-      // },
-    }
-  );
+  } = trpc.docSummary.getDocSummaryByFileId.useQuery({ fileId }, { retry: false });
 
   const { mutate: generateSummary, isPending } = useMutation({
     mutationFn: async () => {
       const response = await fetch("/api/summary", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fileId,
-          regenerate,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileId, regenerate }),
       });
 
       if (!response.ok) {
@@ -63,152 +48,111 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
 
       return response.json() as Promise<SummaryResponse>;
     },
+
     onSuccess: (data) => {
-      console.log(data);
-      // Refetch to update the UI
+      increment("summarizeCount"); // ✅ update usage
       refetchSummary();
-      // Redirect to editor with the summary ID
       router.push(`/editor/${data.id}`);
     },
+
     onError: (error) => {
       console.error("Error generating summary:", error);
       alert(error instanceof Error ? error.message : "Failed to generate summary");
     },
   });
 
-  const handleGenerateSummary = () => {
-    generateSummary();
-  };
-
-  const handleViewSummary = () => {
-    if (existingSummary?.id) {
-      router.push(`/editor/${existingSummary.id}`);
-    }
-  };
-
-  // Show loading state while checking for existing summary
   if (isCheckingExisting) {
     return (
-      <div className="p-4 md:p-6">
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-        </div>
+      <div className="p-6 flex justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
       </div>
     );
   }
 
-  // If summary exists, show different UI
+  const UsageInfo = () =>
+    currentFile && (
+      <div className="text-xs text-gray-600 flex justify-between items-center mb-2">
+        <span>
+          Summaries used:{" "}
+          <strong>
+            {currentFile.summarizeCount} / {currentFile.summarizeLimit}
+          </strong>
+        </span>
+        {!canSummarize() && <span className="text-red-500 font-medium">Limit reached</span>}
+      </div>
+    );
+
+  // ================= EXISTING SUMMARY =================
   if (existingSummary) {
     return (
-      <div className="p-4 md:p-6">
-        <h3 className="text-lg font-semibold mb-4">Document Summary</h3>
-        <div className="space-y-4">
-          {/* Existing Summary Info */}
-          <div className="border border-green-200 bg-green-50 rounded-lg p-4 space-y-3">
-            <div className="flex items-start gap-3">
-              <FileText className="h-5 w-5 text-green-600 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-green-900">Summary Already Exists</p>
-                <p className="text-sm text-green-700 mt-1">
-                  A summary was generated on{" "}
-                  {new Date(existingSummary.createdAt).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-                {existingSummary.updatedAt && existingSummary.updatedAt !== existingSummary.createdAt && (
-                  <p className="text-xs text-green-600 mt-1">
-                    Last updated:{" "}
-                    {new Date(existingSummary.updatedAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                )}
-              </div>
+      <div className="p-4 md:p-6 space-y-4">
+        <h3 className="text-lg font-semibold">Document Summary</h3>
+
+        <UsageInfo />
+
+        <div className="border border-green-200 bg-green-50 rounded-lg p-4">
+          <div className="flex gap-3">
+            <FileText className="h-5 w-5 text-green-600 mt-1" />
+            <div>
+              <p className="font-medium text-green-900">Summary Already Exists</p>
+              <p className="text-sm text-green-700">
+                Created on {new Date(existingSummary.createdAt).toLocaleString()}
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Button
-              onClick={handleViewSummary}
-              // className="flex items-center justify-center gap-2 bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition"
-            >
-              <Eye className="h-5 w-5" />
-              View Summary
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setRegenerate(true);
-                generateSummary();
-              }}
-              disabled={isPending}
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Regenerating...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-5 w-5" />
-                  Regenerate
-                </>
-              )}
-            </Button>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Button onClick={() => router.push(`/editor/${existingSummary.id}`)}>
+            <Eye className="h-4 w-4" />
+            View Summary
+          </Button>
 
-          {/* Info Text */}
-          <div className="text-xs text-gray-500 text-center pt-2">
-            Regenerating will create a new summary and replace the existing one.
-          </div>
+          <Button
+            variant="outline"
+            disabled={isPending || !canSummarize()}
+            onClick={() => {
+              setRegenerate(true);
+              generateSummary();
+            }}
+          >
+            {!canSummarize() ? "Limit reached" : isPending ? "Regenerating..." : "Regenerate"}
+          </Button>
         </div>
       </div>
     );
   }
 
-  // Default UI when no summary exists
+  // ================= NO SUMMARY =================
   return (
-    <div className="p-4 md:p-6">
-      <h3 className="text-lg font-semibold mb-4">Generate Document Summary</h3>
-      <div className="space-y-4">
-        <div className="border rounded-lg p-4 space-y-3">
-          <div className="text-sm text-gray-600 mb-3">
-            Generate an AI-powered summary of your PDF document in DOCX format.
-          </div>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              className="rounded"
-              checked={regenerate}
-              onChange={(e) => setRegenerate(e.target.checked)}
-              disabled={isPending}
-            />
-            <span className="text-sm">Regenerate if summary already exists</span>
-          </label>
-        </div>
-        <button
-          onClick={handleGenerateSummary}
-          disabled={isPending}
-          className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {isPending ? (
-            <>
-              <Loader2 className="h-5 w-5 animate-spin" />
-              Generating Summary...
-            </>
-          ) : (
-            "Generate Summary"
-          )}
-        </button>
+    <div className="p-4 md:p-6 space-y-4">
+      <h3 className="text-lg font-semibold">Generate Document Summary</h3>
+
+      <UsageInfo />
+
+      <div className="border rounded-lg p-4 space-y-3">
+        <p className="text-sm text-gray-600">Generate an AI-powered summary of your PDF document.</p>
+
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={regenerate}
+            onChange={(e) => setRegenerate(e.target.checked)}
+            disabled={isPending}
+          />
+          Regenerate if summary already exists
+        </label>
       </div>
+
+      <button
+        onClick={() => generateSummary()}
+        disabled={isPending || !canSummarize()}
+        className="w-full bg-blue-500 text-white py-3 rounded-lg
+          hover:bg-blue-600 transition
+          disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isPending ? "Generating Summary..." : !canSummarize() ? "Summary limit reached" : "Generate Summary"}
+      </button>
     </div>
   );
 };
