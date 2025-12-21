@@ -27,6 +27,7 @@ model User {
   stripePriceId          String?           @map(name: "stripe_price_id")
   stripeCurrentPeriodEnd DateTime?         @map(name: "stripe_current_period_end")
   documentSummaries      DocumentSummary[]
+  presentations          Presentation[]
 }
 
 enum UploadStatus {
@@ -52,6 +53,7 @@ model File {
   userId          String?
   documentSummary DocumentSummary?
   documentInsight DocumentInsight?
+  presentations   Presentation[]
 }
 
 model Message {
@@ -78,7 +80,7 @@ model DocumentSummary {
   User   User?   @relation(fields: [userId], references: [id])
   userId String?
   File   File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  fileId String  @unique 
+  fileId String  @unique
 
   @@index([userId])
   @@index([fileId])
@@ -101,4 +103,25 @@ model DocumentInsight {
 
   @@index([userId])
   @@index([fileId])
+}
+
+// Add this to your existing schema.prisma file
+
+model Presentation {
+  id          String   @id @default(cuid())
+  fileId      String   @unique // Changed to @unique to enforce one presentation per file
+  userId      String
+  fileName    String
+  slideCount  Int
+  content     String   @db.Text // JSON string of presentation structure
+  pptxData    String   @db.Text // Base64 encoded PPTX file
+  downloadUrl String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }

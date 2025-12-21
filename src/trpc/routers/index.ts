@@ -6,6 +6,7 @@ import { docInsightRouter } from "./docInsight";
 import { docSummaryRouter } from "./docSummary";
 import { fileRouter } from "./file";
 import { messageRouter } from "./message";
+import { presentationRouter } from "./presentation";
 
 export const appRouter = router({
   auth: authRouter,
@@ -14,6 +15,7 @@ export const appRouter = router({
   billing: billingRouter,
   docSummary: docSummaryRouter,
   docInsight: docInsightRouter,
+  presentation: presentationRouter,
 });
 
 export type AppRouter = typeof appRouter;

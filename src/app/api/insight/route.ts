@@ -37,14 +37,12 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // Check if insight already exists
     const existingInsight = await db.documentInsight.findUnique({
       where: {
         fileId,
       },
     });
 
-    // If insight exists and not regenerating, return existing
     if (existingInsight && !regenerate) {
       return NextResponse.json({
         insight: existingInsight.insight,
@@ -59,7 +57,6 @@ export const POST = async (req: NextRequest) => {
       });
     }
 
-    // Get embeddings and vector store
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
     });
@@ -72,7 +69,6 @@ export const POST = async (req: NextRequest) => {
       namespace: file.id,
     });
 
-    // Retrieve comprehensive content for deep analysis
     const results = await vectorStore.similaritySearch(
       "key insights analysis patterns trends implications recommendations",
       15
@@ -82,7 +78,6 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: "No content found for this document" }, { status: 404 });
     }
 
-    // Generate insight using AI SDK with structured output
     const { text } = await generateText({
       model: openai("gpt-4-turbo-preview"),
       temperature: 0.4,
@@ -131,8 +126,6 @@ Respond ONLY with valid JSON, no additional text.`,
       ],
     });
 
-    console.log("erro", text);
-    // Parse the JSON response
     let parsedInsight;
     try {
       parsedInsight = JSON.parse(text);
@@ -141,7 +134,6 @@ Respond ONLY with valid JSON, no additional text.`,
       return NextResponse.json({ error: "Failed to generate structured insight" }, { status: 500 });
     }
 
-    // Save or update insight in database
     let savedInsight;
     if (existingInsight) {
       savedInsight = await db.documentInsight.update({
