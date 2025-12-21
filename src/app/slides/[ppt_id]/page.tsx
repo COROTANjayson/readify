@@ -1,9 +1,8 @@
 import { redirect } from "next/navigation";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
-
-import { db } from "@/db";
 import MySlidePage from "@/components/slide/SlidePage";
+import { db } from "@/db";
 
 interface PageProps {
   params: {

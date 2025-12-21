@@ -2,17 +2,16 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { PineconeStore } from "@langchain/pinecone";
-import { getPineconeClient } from "@/lib/pinecone";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 
 import { PLANS } from "@/config/stripe";
 import { db } from "@/db";
+import { getPineconeClient } from "@/lib/pinecone";
 import { getUserSubscriptionPlan } from "@/lib/stripe";
 
 const embeddings = new OpenAIEmbeddings({
   model: "text-embedding-3-large",
 });
-
 
 //for generating docs
 //https://chatgpt.com/c/69230341-7544-8324-8973-2ed155a6d90a

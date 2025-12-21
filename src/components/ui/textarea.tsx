@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import * as React from "react";
 import TextareaAutosize, { TextareaAutosizeProps } from "react-textarea-autosize";

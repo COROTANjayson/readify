@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import type { Value } from "platejs";
+
 import { trpc } from "@/app/_trpc/client";
 import { StateDisplay } from "../StateDisplay";
 import { EditorHeader } from "./EditorHeader";
@@ -39,7 +40,6 @@ export default function MyEditorPage({ doc_id }: { doc_id: string }) {
 
   // Handlers
   const handleSave = () => {
-
     if (!currentValue || !summaryId) return;
 
     updateSummary({

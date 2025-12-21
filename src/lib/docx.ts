@@ -40,7 +40,7 @@ export function htmlToPlateValue(html: string): Value {
       const element = node as HTMLElement;
       const tagName = element.tagName.toLowerCase();
 
-      let children: any[] = [];
+      const children: any[] = [];
       node.childNodes.forEach((child) => {
         const processed = processNode(child, marks);
         if (processed !== null) {

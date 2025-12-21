@@ -5,9 +5,9 @@ import { Menu } from "lucide-react";
 
 import { tools } from "@/lib/config/tools";
 import ChatWrapper from "./chat/ChatWrapper";
-import SummaryWrapper from "./summary/SummaryWrapper";
 import InsightWrapper from "./insight/InsightWrapper";
 import PPTWrapper from "./ppt/PPTWrapper";
+import SummaryWrapper from "./summary/SummaryWrapper";
 import { ToolsContext } from "./ToolsContext";
 
 const ToolsContent = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {

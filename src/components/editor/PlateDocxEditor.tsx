@@ -19,6 +19,7 @@ import {
   NumberedListPlugin,
   TaskListPlugin,
 } from "@platejs/list-classic/react";
+import htmlDocx from "html-docx-js/dist/html-docx";
 import { Loader2, Save, Trash2 } from "lucide-react";
 import * as mammoth from "mammoth";
 import type { Value } from "platejs";
@@ -33,7 +34,6 @@ import { H1Element, H2Element, H3Element } from "@/components/ui/heading-node";
 import { BulletedListElement, NumberedListElement } from "@/components/ui/list-classic-node";
 import { MarkToolbarButton } from "@/components/ui/mark-toolbar-button";
 import { ToolbarButton } from "@/components/ui/toolbar";
-import htmlDocx from "html-docx-js/dist/html-docx";
 
 export default function MyEditorPage({ doc_id }: { doc_id: string }) {
   const params = useParams();

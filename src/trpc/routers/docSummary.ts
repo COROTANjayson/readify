@@ -21,7 +21,7 @@ export const docSummaryRouter = router({
           File: true, // Include file information if needed
         },
       });
-      console.log("summary", summary)
+      console.log("summary", summary);
 
       if (!summary) {
         throw new TRPCError({

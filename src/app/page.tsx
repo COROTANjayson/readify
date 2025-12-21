@@ -65,7 +65,6 @@ export default function Home() {
         </div>
       </MaxWidthWrapper>
 
-
       <div id="features" className="mx-auto mb-32 mt-32 max-w-5xl sm:mt-56">
         <div className="mb-12 px-6 lg:px-8">
           <div className="mx-auto max-w-2xl sm:text-center">
