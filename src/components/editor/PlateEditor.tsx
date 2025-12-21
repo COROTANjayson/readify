@@ -71,7 +71,7 @@ export function PlateEditor({
 
   return (
     <Plate
-      onChange={async ({ value }) => {
+      onChange={async () => {
         const html = await serializeHtml(editor);
         onValueChange?.(html);
       }}

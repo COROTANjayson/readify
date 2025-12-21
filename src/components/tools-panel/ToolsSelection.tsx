@@ -6,6 +6,59 @@ import { X } from "lucide-react";
 import { tools } from "@/lib/config/tools";
 import { ToolsContext } from "./ToolsContext";
 
+const ToolButton = ({ tool, selectedTools, onSelect }: any) => (
+  <button
+    onClick={() => onSelect(tool.id)}
+    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition text-left 
+      ${
+        selectedTools === tool.id
+          ? "bg-blue-50 text-blue-600 border-2 border-blue-500"
+          : "text-gray-700 hover:bg-gray-50 border-2 border-transparent"
+      }
+    `}
+  >
+    {tool.icon}
+    <div className="flex-1">
+      <div className="text-sm font-medium">{tool.name}</div>
+      <div className="text-xs text-gray-500">{tool.description}</div>
+    </div>
+  </button>
+);
+
+const DesktopContent = ({ onClose, selectedTools, handleToolsSelect }: any) => (
+  <>
+    <div className="flex items-center justify-between p-4 border-b">
+      <h2 className="text-lg font-semibold">Select Tools</h2>
+      <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+        <X className="w-5 h-5" />
+      </button>
+    </div>
+
+    <div className="p-4 space-y-2 overflow-y-auto" style={{ maxHeight: "calc(100vh - 8rem)" }}>
+      {tools.map((tool) => (
+        <ToolButton key={tool.id} tool={tool} selectedTools={selectedTools} onSelect={handleToolsSelect} />
+      ))}
+    </div>
+  </>
+);
+
+const MobileContent = ({ onClose, selectedTools, handleToolsSelect }: any) => (
+  <>
+    <div className="flex items-center justify-between p-4 border-b">
+      <h2 className="text-lg font-semibold">Tools</h2>
+      <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+        <X className="w-5 h-5" />
+      </button>
+    </div>
+
+    <div className="p-4 space-y-2 overflow-y-auto h-full">
+      {tools.map((tool) => (
+        <ToolButton key={tool.id} tool={tool} selectedTools={selectedTools} onSelect={handleToolsSelect} />
+      ))}
+    </div>
+  </>
+);
+
 const ToolsSelection: React.FC = () => {
   const { isToolsMenuOpen, setIsToolsMenuOpen, selectedTools, handleToolsSelect } = useContext(ToolsContext);
 
@@ -97,57 +150,3 @@ const ToolsSelection: React.FC = () => {
 };
 
 export default ToolsSelection;
-
-/* COMPONENT SPLITTING FOR CLEANER CODE */
-const DesktopContent = ({ onClose, selectedTools, handleToolsSelect }: any) => (
-  <>
-    <div className="flex items-center justify-between p-4 border-b">
-      <h2 className="text-lg font-semibold">Select Tools</h2>
-      <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-        <X className="w-5 h-5" />
-      </button>
-    </div>
-
-    <div className="p-4 space-y-2 overflow-y-auto" style={{ maxHeight: "calc(100vh - 8rem)" }}>
-      {tools.map((tool) => (
-        <ToolButton key={tool.id} tool={tool} selectedTools={selectedTools} onSelect={handleToolsSelect} />
-      ))}
-    </div>
-  </>
-);
-
-const MobileContent = ({ onClose, selectedTools, handleToolsSelect }: any) => (
-  <>
-    <div className="flex items-center justify-between p-4 border-b">
-      <h2 className="text-lg font-semibold">Tools</h2>
-      <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-        <X className="w-5 h-5" />
-      </button>
-    </div>
-
-    <div className="p-4 space-y-2 overflow-y-auto h-full">
-      {tools.map((tool) => (
-        <ToolButton key={tool.id} tool={tool} selectedTools={selectedTools} onSelect={handleToolsSelect} />
-      ))}
-    </div>
-  </>
-);
-
-const ToolButton = ({ tool, selectedTools, onSelect }: any) => (
-  <button
-    onClick={() => onSelect(tool.id)}
-    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition text-left 
-      ${
-        selectedTools === tool.id
-          ? "bg-blue-50 text-blue-600 border-2 border-blue-500"
-          : "text-gray-700 hover:bg-gray-50 border-2 border-transparent"
-      }
-    `}
-  >
-    {tool.icon}
-    <div className="flex-1">
-      <div className="text-sm font-medium">{tool.name}</div>
-      <div className="text-xs text-gray-500">{tool.description}</div>
-    </div>
-  </button>
-);

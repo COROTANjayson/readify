@@ -10,7 +10,7 @@ interface InsightWrapperProps {
 }
 
 const InsightWrapper = ({ fileId, isSubscribed }: InsightWrapperProps) => {
-  console.log(isSubscribed)
+  console.log(isSubscribed);
   const utils = trpc.useUtils();
 
   const { data: insightData, isLoading: isFetching } = trpc.docInsight.getDocInsightByFileId.useQuery(

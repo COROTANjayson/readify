@@ -18,40 +18,6 @@ const listVariants = cva("m-0 py-1 ps-6", {
   },
 });
 
-export function ListElement({ variant, ...props }: PlateElementProps & VariantProps<typeof listVariants>) {
-  return (
-    <PlateElement as={variant!} className={listVariants({ variant })} {...props}>
-      {props.children}
-    </PlateElement>
-  );
-}
-
-export function BulletedListElement(props: PlateElementProps) {
-  return <ListElement variant="ul" {...props} />;
-}
-
-export function NumberedListElement(props: PlateElementProps) {
-  return <ListElement variant="ol" {...props} />;
-}
-
-export function TaskListElement(props: PlateElementProps) {
-  return (
-    <PlateElement as="ul" className="m-0 list-none! py-1 ps-6" {...props}>
-      {props.children}
-    </PlateElement>
-  );
-}
-
-export function ListItemElement(props: PlateElementProps) {
-  const isTaskList = "checked" in props.element;
-
-  if (isTaskList) {
-    return <TaskListItemElement {...props} />;
-  }
-
-  return <BaseListItemElement {...props} />;
-}
-
 export function BaseListItemElement(props: PlateElementProps) {
   return (
     <PlateElement as="li" {...props}>
@@ -86,4 +52,38 @@ export function TaskListItemElement(props: PlateElementProps) {
       {otherChildren}
     </BaseListItemElement>
   );
+}
+
+export function ListElement({ variant, ...props }: PlateElementProps & VariantProps<typeof listVariants>) {
+  return (
+    <PlateElement as={variant!} className={listVariants({ variant })} {...props}>
+      {props.children}
+    </PlateElement>
+  );
+}
+
+export function BulletedListElement(props: PlateElementProps) {
+  return <ListElement variant="ul" {...props} />;
+}
+
+export function NumberedListElement(props: PlateElementProps) {
+  return <ListElement variant="ol" {...props} />;
+}
+
+export function TaskListElement(props: PlateElementProps) {
+  return (
+    <PlateElement as="ul" className="m-0 list-none! py-1 ps-6" {...props}>
+      {props.children}
+    </PlateElement>
+  );
+}
+
+export function ListItemElement(props: PlateElementProps) {
+  const isTaskList = "checked" in props.element;
+
+  if (isTaskList) {
+    return <TaskListItemElement {...props} />;
+  }
+
+  return <BaseListItemElement {...props} />;
 }
