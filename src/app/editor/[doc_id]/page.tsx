@@ -6,9 +6,10 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 // import MyEditorPage from "@/components/editor/PlateDocxEditor";
 import MyEditorPage from "@/components/editor/EditorPage";
+
 // import AppHello from "@/components/tools-panel/test";
 // import PdfRenderer from "@/components/PdfRenderer";
-import { db } from "@/db";
+// import { db } from "@/db";
 
 interface PageProps {
   params: {

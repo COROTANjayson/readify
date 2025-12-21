@@ -19,7 +19,7 @@ export const POST = async (req: NextRequest) => {
     }
 
     const { id: userId } = user;
-    const { fileId, regenerate = false, insightType = "comprehensive" } = body;
+    const { fileId, regenerate = false } = body;
 
     if (!fileId) {
       return NextResponse.json({ error: "File ID is required" }, { status: 400 });

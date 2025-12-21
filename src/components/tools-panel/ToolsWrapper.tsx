@@ -1,9 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import { Menu } from "lucide-react";
 
-import { tools } from "@/lib/config/tools";
 import ToolsContent from "./ToolsContent";
 import { ToolsContext, ToolsContextProvider } from "./ToolsContext";
 import ToolsHeader from "./ToolsHeader";

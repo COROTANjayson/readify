@@ -19,6 +19,7 @@ interface SummaryResponse {
 }
 
 const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {
+  console.log(isSubscribed);
   const router = useRouter();
   const [regenerate, setRegenerate] = useState(false);
   // error.data?.code === "NOT_FOUND"
@@ -27,7 +28,7 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
     data: existingSummary,
     isLoading: isCheckingExisting,
     refetch: refetchSummary,
-    error,
+    // error,
   } = trpc.docSummary.getDocSummaryByFileId.useQuery(
     { fileId },
     {

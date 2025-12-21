@@ -1,4 +1,4 @@
-import { BookOpen, FileSpreadsheet, FileText, MessageSquare, Presentation, Sparkles } from "lucide-react";
+import { BookOpen, MessageSquare, Presentation, Sparkles } from "lucide-react";
 
 export interface Feature {
   id: string;

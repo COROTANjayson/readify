@@ -1,6 +1,4 @@
-import { createContext, ReactNode, useRef, useState } from "react";
-
-import ToolsSelection from "./ToolsSelection";
+import { createContext, ReactNode, useState } from "react";
 
 type StreamResponse = {
   isToolsMenuOpen: boolean;

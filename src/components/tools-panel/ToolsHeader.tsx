@@ -7,7 +7,7 @@ import { tools } from "@/lib/config/tools";
 import { ToolsContext } from "./ToolsContext";
 
 const ToolsHeader = () => {
-  const { isToolsMenuOpen, setIsToolsMenuOpen, selectedTools, handleToolsSelect } = useContext(ToolsContext);
+  const { isToolsMenuOpen, setIsToolsMenuOpen, selectedTools } = useContext(ToolsContext);
   return (
     <div className="border-b p-4 flex items-center justify-between">
       <div>

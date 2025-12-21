@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2, HelpCircle, Lightbulb, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -11,6 +10,7 @@ interface InsightWrapperProps {
 }
 
 const InsightWrapper = ({ fileId, isSubscribed }: InsightWrapperProps) => {
+  console.log(isSubscribed)
   const utils = trpc.useUtils();
 
   const { data: insightData, isLoading: isFetching } = trpc.docInsight.getDocInsightByFileId.useQuery(

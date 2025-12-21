@@ -1,9 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import { Menu } from "lucide-react";
 
-import { tools } from "@/lib/config/tools";
 import ChatWrapper from "./chat/ChatWrapper";
 import InsightWrapper from "./insight/InsightWrapper";
 import PPTWrapper from "./ppt/PPTWrapper";

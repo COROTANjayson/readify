@@ -6,21 +6,6 @@ import { Plate, usePlateEditor } from "platejs/react";
 import { BasicNodesKit } from "@/components/basic-nodes-kit";
 import { Editor, EditorContainer } from "@/components/ui/editor";
 
-export function PlateEditor() {
-  const editor = usePlateEditor({
-    plugins: BasicNodesKit,
-    value,
-  });
-
-  return (
-    <Plate editor={editor}>
-      <EditorContainer>
-        <Editor variant="demo" placeholder="Type..." />
-      </EditorContainer>
-    </Plate>
-  );
-}
-
 const value = normalizeNodeId([
   {
     children: [{ text: "Basic Editor" }],
@@ -53,3 +38,18 @@ const value = normalizeNodeId([
     type: "p",
   },
 ]);
+
+export function PlateEditor() {
+  const editor = usePlateEditor({
+    plugins: BasicNodesKit,
+    value,
+  });
+
+  return (
+    <Plate editor={editor}>
+      <EditorContainer>
+        <Editor variant="demo" placeholder="Type..." />
+      </EditorContainer>
+    </Plate>
+  );
+}

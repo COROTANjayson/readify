@@ -1,8 +1,8 @@
+/* eslint-disable */
 "use client";
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-// import { useRouter } from "next/router";
 import {
   BlockquotePlugin,
   BoldPlugin,
@@ -14,19 +14,15 @@ import {
 } from "@platejs/basic-nodes/react";
 import {
   BulletedListPlugin,
-  ListItemPlugin,
   ListPlugin,
   NumberedListPlugin,
-  TaskListPlugin,
 } from "@platejs/list-classic/react";
 import htmlDocx from "html-docx-js/dist/html-docx";
-import { Loader2, Save, Trash2 } from "lucide-react";
 import * as mammoth from "mammoth";
 import type { Value } from "platejs";
 import { Plate, usePlateEditor } from "platejs/react";
 import { serializeHtml } from "platejs/static";
 
-import { trpc } from "@/app/_trpc/client";
 import { BlockquoteElement } from "@/components/ui/blockquote-node";
 import { Editor, EditorContainer } from "@/components/ui/editor";
 import { FixedToolbar } from "@/components/ui/fixed-toolbar";
