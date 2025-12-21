@@ -3,6 +3,7 @@ import { CheckCircle2, HelpCircle, Lightbulb, Loader2, Sparkles } from "lucide-r
 import { toast } from "sonner";
 
 import { trpc } from "@/app/_trpc/client";
+import ToolsUsageInfo from "../ToolsUsageInfo";
 
 interface InsightWrapperProps {
   fileId: string;
@@ -93,6 +94,8 @@ const InsightWrapper = ({ fileId, isSubscribed }: InsightWrapperProps) => {
           <Sparkles className="w-5 h-5 text-purple-500" />
           Generate Insight
         </h3>
+        <ToolsUsageInfo type="insight" />
+
         {insightData && (
           <div className="flex items-center gap-2">
             <button

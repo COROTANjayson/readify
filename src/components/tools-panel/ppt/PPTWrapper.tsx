@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { Download, FileText, Loader2, Trash2 } from "lucide-react";
 
 import { trpc } from "@/app/_trpc/client";
+import ToolsUsageInfo from "../ToolsUsageInfo";
 
 const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {
   const [slideCount, setSlideCount] = useState(5);
@@ -77,9 +78,12 @@ const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: bo
     <div className="p-4 md:p-6 space-y-6">
       {/* Generation Section */}
       <div className="bg-white border rounded-lg p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">
-          {hasPresentation ? "Regenerate Presentation" : "Create Presentation"}
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold mb-4">
+            {hasPresentation ? "Regenerate Presentation" : "Create Presentation"}
+          </h3>
+          <ToolsUsageInfo type="presentation" />
+        </div>
 
         <div className="space-y-4">
           <div className="space-y-2">

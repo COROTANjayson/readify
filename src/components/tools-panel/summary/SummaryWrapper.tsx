@@ -8,6 +8,7 @@ import { Eye, FileText, Loader2, RefreshCw } from "lucide-react";
 import { trpc } from "@/app/_trpc/client";
 import { useFileStore } from "@/app/store/fileStore";
 import { Button } from "@/components/ui/button";
+import ToolsUsageInfo from "../ToolsUsageInfo";
 
 interface SummaryResponse {
   summary: string;
@@ -20,7 +21,7 @@ interface SummaryResponse {
 }
 
 const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {
-  console.log(isSubscribed)
+  console.log(isSubscribed);
   const router = useRouter();
   const [regenerate, setRegenerate] = useState(false);
 
@@ -69,26 +70,14 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
     );
   }
 
-  const UsageInfo = () =>
-    currentFile && (
-      <div className="text-xs text-gray-600 flex justify-between items-center mb-2">
-        <span>
-          Summaries used:{" "}
-          <strong>
-            {currentFile.summarizeCount} / {currentFile.summarizeLimit}
-          </strong>
-        </span>
-        {!canSummarize() && <span className="text-red-500 font-medium">Limit reached</span>}
-      </div>
-    );
-
   // ================= EXISTING SUMMARY =================
   if (existingSummary) {
     return (
       <div className="p-4 md:p-6 space-y-4">
-        <h3 className="text-lg font-semibold">Document Summary</h3>
-
-        <UsageInfo />
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Document Summary</h3>
+          <ToolsUsageInfo type="summarize" />
+        </div>
 
         <div className="border border-green-200 bg-green-50 rounded-lg p-4">
           <div className="flex gap-3">
@@ -126,10 +115,10 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
   // ================= NO SUMMARY =================
   return (
     <div className="p-4 md:p-6 space-y-4">
-      <h3 className="text-lg font-semibold">Generate Document Summary</h3>
-
-      <UsageInfo />
-
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold">Generate Document Summary</h3>
+        <ToolsUsageInfo type="summarize" />
+      </div>
       <div className="border rounded-lg p-4 space-y-3">
         <p className="text-sm text-gray-600">Generate an AI-powered summary of your PDF document.</p>
 
