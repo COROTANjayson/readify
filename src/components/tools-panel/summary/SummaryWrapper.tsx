@@ -25,7 +25,7 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
   const router = useRouter();
   const [regenerate, setRegenerate] = useState(false);
   const utils = trpc.useUtils();
-  const { currentFile, canSummarize, increment } = useFileStore();
+  const { canSummarize, increment } = useFileStore();
 
   // Check if summary already exists
   const {

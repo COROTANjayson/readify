@@ -5,12 +5,14 @@ import { format } from "date-fns";
 import { Download, FileText, Loader2, Trash2 } from "lucide-react";
 
 import { trpc } from "@/app/_trpc/client";
+import { useFileStore } from "@/app/store/fileStore";
 import ToolsUsageInfo from "../ToolsUsageInfo";
 
 const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {
   const [slideCount, setSlideCount] = useState(5);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { canPresentation } = useFileStore();
 
   const utils = trpc.useUtils();
 
@@ -118,7 +120,7 @@ const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: bo
 
           <button
             onClick={handleGenerate}
-            disabled={isGenerating}
+            disabled={isGenerating || !canPresentation()}
             className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isGenerating ? (
