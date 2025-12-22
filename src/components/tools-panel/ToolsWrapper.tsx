@@ -2,6 +2,7 @@
 
 import { useContext, useEffect } from "react";
 
+import { trpc } from "@/app/_trpc/client";
 import { useFileStore } from "@/app/store/fileStore";
 import { FileOutput } from "@/types/file";
 import ToolsContent from "./ToolsContent";
@@ -11,17 +12,19 @@ import ToolsSelection from "./ToolsSelection";
 
 const ToolsWrapper = ({ file, isSubscribed }: { file: FileOutput; isSubscribed: boolean }) => {
   const { isToolsMenuOpen } = useContext(ToolsContext);
-  const setFile = useFileStore((state) => state.setFile);
 
-  useEffect(() => {
-    setFile(file);
-  }, [file, setFile]);
+  const { data: currentFile } = trpc.file.getFileById.useQuery(
+    { fileId: file.id },
+    {
+      initialData: file,
+    }
+  );
 
   return (
     <ToolsContextProvider fileId={file.id}>
       <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
         <ToolsHeader />
-        <ToolsContent fileId={file.id} isSubscribed={isSubscribed} />
+        <ToolsContent file={currentFile} isSubscribed={isSubscribed} />
       </div>
       {isToolsMenuOpen && <ToolsSelection />}
     </ToolsContextProvider>

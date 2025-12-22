@@ -1,26 +1,35 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
+import { useFileStore } from "@/app/store/fileStore";
+import { FileOutput } from "@/types/file";
 import ChatWrapper from "./chat/ChatWrapper";
 import InsightWrapper from "./insight/InsightWrapper";
 import PPTWrapper from "./ppt/PPTWrapper";
 import SummaryWrapper from "./summary/SummaryWrapper";
 import { ToolsContext } from "./ToolsContext";
 
-const ToolsContent = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {
+const ToolsContent = ({ file, isSubscribed }: { file: FileOutput; isSubscribed: boolean }) => {
+  const setFile = useFileStore((state) => state.setFile);
+
+  useEffect(() => {
+    console.log("file updated in tools content")
+    setFile(file);
+  }, [file, setFile]);
+
   const { selectedTools } = useContext(ToolsContext);
 
   const renderFeatureContent = () => {
     switch (selectedTools) {
       case "chat":
-        return <ChatWrapper fileId={fileId} isSubscribed={isSubscribed} />;
+        return <ChatWrapper fileId={file.id} isSubscribed={isSubscribed} />;
       case "summarize":
-        return <SummaryWrapper fileId={fileId} isSubscribed={isSubscribed} />;
+        return <SummaryWrapper fileId={file.id} isSubscribed={isSubscribed} />;
       case "ppt":
-        return <PPTWrapper fileId={fileId} isSubscribed={isSubscribed} />;
+        return <PPTWrapper fileId={file.id} isSubscribed={isSubscribed} />;
       case "insights":
-        return <InsightWrapper fileId={fileId} isSubscribed={isSubscribed} />;
+        return <InsightWrapper fileId={file.id} isSubscribed={isSubscribed} />;
 
       default:
         return null;

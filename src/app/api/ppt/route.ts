@@ -29,25 +29,16 @@ export const POST = async (req: NextRequest) => {
 
     // Verify file ownership
     const file = await db.file.findFirst({
-      where: {
-        id: fileId,
-        userId,
-      },
+      where: { id: fileId, userId },
     });
-
     if (!file) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
     // Check for existing presentation
     const existingPresentation = await db.presentation.findFirst({
-      where: {
-        fileId,
-        userId,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+      where: { fileId, userId },
+      orderBy: { createdAt: "desc" },
     });
 
     if (existingPresentation && !regenerate) {
@@ -63,18 +54,27 @@ export const POST = async (req: NextRequest) => {
 
     // If regenerating, delete the old presentation
     if (existingPresentation && regenerate) {
-      await db.presentation.delete({
-        where: {
-          id: existingPresentation.id,
-        },
-      });
+      await db.presentation.delete({ where: { id: existingPresentation.id } });
     }
 
-    // Get document content from Pinecone
-    const embeddings = new OpenAIEmbeddings({
-      openAIApiKey: process.env.OPENAI_API_KEY,
+    // 🚨 Step 1: Reserve presentation slot (transaction)
+    await db.$transaction(async (tx) => {
+      const fileInTx = await tx.file.findUnique({ where: { id: fileId } });
+      if (!fileInTx) throw new Error("File not found");
+      if (fileInTx.presentationCount >= fileInTx.presentationLimit) {
+        throw new Error("Presentation limit reached");
+      }
+      // Increment to reserve slot
+      await tx.file.update({
+        where: { id: fileId },
+        data: { presentationCount: { increment: 1 } },
+      });
     });
 
+    // Step 2: Generate PPT content
+
+    // Get document content from Pinecone
+    const embeddings = new OpenAIEmbeddings({ openAIApiKey: process.env.OPENAI_API_KEY });
     const pinecone = await getPineconeClient();
     const pineconeIndex = pinecone.Index("summaraize");
 
@@ -83,7 +83,6 @@ export const POST = async (req: NextRequest) => {
       namespace: file.id,
     });
 
-    // Retrieve relevant content for presentation
     const results = await vectorStore.similaritySearch(
       "summary key points main topics important information highlights",
       15
@@ -95,81 +94,59 @@ export const POST = async (req: NextRequest) => {
 
     const documentContent = results.map((r) => r.pageContent).join("\n\n");
 
-    // Generate presentation content using OpenAI
+    // Generate presentation JSON
     const { text } = await generateText({
       model: openai("gpt-4-turbo-preview"),
       temperature: 0.4,
       messages: [
         {
           role: "system",
-          content: `You are an expert presentation designer who creates well-structured, engaging slide decks. You excel at distilling complex information into clear, concise slides with compelling narratives.`,
+          content: "You are an expert presentation designer who creates well-structured, engaging slide decks.",
         },
         {
           role: "user",
-          content: `Create a ${slideCount}-slide presentation outline based on the document content below. Respond ONLY with pure JSON. Do NOT include code fences, markdown, or backticks.
+          content: `Create a ${slideCount}-slide presentation outline based on the document content below. Respond ONLY with pure JSON.
 
 DOCUMENT CONTENT:
 ${documentContent}
 
-Generate a JSON response with this EXACT structure:
+Generate JSON with structure:
 {
   "title": "Compelling Presentation Title",
   "slides": [
-    {
-      "title": "Slide Title",
-      "content": ["Bullet point 1", "Bullet point 2", "Bullet point 3"]
-    }
+    { "title": "Slide Title", "content": ["Bullet 1", "Bullet 2"] }
   ]
 }
 
 Requirements:
-- Create exactly ${slideCount} slides
-- First slide should be a title slide with just the main topic
-- Each content slide should have a clear, descriptive title
-- Each slide should have 3-5 concise, impactful bullet points
-- Bullet points should be actionable and specific
-- Content should flow logically from slide to slide
-- Last slide can be a summary, conclusion, or call-to-action
-- Use professional language suitable for business presentations
-- Ensure all content is derived from the provided document
-
-Remember: Return ONLY the JSON object, no additional text or formatting.`,
+- ${slideCount} slides
+- Title slide first
+- 3-5 bullet points per slide
+- Logical flow
+- Use professional language
+Return ONLY JSON.`,
         },
       ],
     });
 
-    // Clean and parse the response
     const cleanedResponse = text
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim();
+    const presentationData = JSON.parse(cleanedResponse);
 
-    let presentationData;
-    try {
-      presentationData = JSON.parse(cleanedResponse);
-    } catch (parseError) {
-      console.error("JSON parse error:", parseError);
-      console.error("Raw response:", text);
-      return NextResponse.json({ error: "Failed to parse presentation data" }, { status: 500 });
-    }
-
-    // Validate the structure
     if (!presentationData.title || !Array.isArray(presentationData.slides)) {
       return NextResponse.json({ error: "Invalid presentation structure" }, { status: 500 });
     }
 
-    // Generate PowerPoint using PptxGenJS
+    // Generate PPTX
     const pptx = new PptxGenJS();
-
-    // Set presentation properties
     pptx.author = user.given_name || "User";
     pptx.company = "Summaraize";
     pptx.title = presentationData.title;
 
-    // Add title slide
     const titleSlide = pptx.addSlide();
     titleSlide.background = { color: "F1F5F9" };
-
     titleSlide.addText(presentationData.title, {
       x: 0.5,
       y: 2.5,
@@ -180,7 +157,6 @@ Remember: Return ONLY the JSON object, no additional text or formatting.`,
       color: "1E293B",
       align: "center",
     });
-
     titleSlide.addText(`Generated from: ${file.name}`, {
       x: 0.5,
       y: 4.5,
@@ -191,52 +167,23 @@ Remember: Return ONLY the JSON object, no additional text or formatting.`,
       align: "center",
     });
 
-    // Add content slides
     for (let i = 1; i < presentationData.slides.length; i++) {
       const slideData = presentationData.slides[i];
       const slide = pptx.addSlide();
       slide.background = { color: "FFFFFF" };
+      slide.addText(slideData.title, { x: 0.5, y: 0.5, w: 9, h: 0.75, fontSize: 32, bold: true, color: "1E293B" });
 
-      // Add slide title
-      slide.addText(slideData.title, {
-        x: 0.5,
-        y: 0.5,
-        w: 9,
-        h: 0.75,
-        fontSize: 32,
-        bold: true,
-        color: "1E293B",
-      });
-
-      // Add bullet points
-      const bulletPoints = slideData.content.map((point: string) => ({
+      const bullets = slideData.content.map((point: string) => ({
         text: point,
         options: { bullet: true, fontSize: 18, color: "334155" },
       }));
-
-      slide.addText(bulletPoints, {
-        x: 1,
-        y: 1.5,
-        w: 8,
-        h: 4,
-      });
-
-      // Add slide number
-      slide.addText(`${i + 1}`, {
-        x: 9,
-        y: 5.2,
-        w: 0.5,
-        h: 0.3,
-        fontSize: 12,
-        color: "94A3B8",
-        align: "right",
-      });
+      slide.addText(bullets, { x: 1, y: 1.5, w: 8, h: 4 });
+      slide.addText(`${i + 1}`, { x: 9, y: 5.2, w: 0.5, h: 0.3, fontSize: 12, color: "94A3B8", align: "right" });
     }
 
-    // Generate PPTX file as base64
     const pptxData = await pptx.write({ outputType: "base64" });
 
-    // Save presentation metadata to database
+    // Step 3: Save presentation record
     const presentation = await db.presentation.create({
       data: {
         fileId,
@@ -244,7 +191,7 @@ Remember: Return ONLY the JSON object, no additional text or formatting.`,
         fileName: `${file.name.replace(/\.[^/.]+$/, "")}_presentation.pptx`,
         slideCount,
         content: JSON.stringify(presentationData),
-        pptxData: pptxData as string, // Store base64 data
+        pptxData: pptxData as string,
         downloadUrl: `/api/download-ppt/${fileId}`,
       },
     });
@@ -256,8 +203,9 @@ Remember: Return ONLY the JSON object, no additional text or formatting.`,
       slideCount: presentation.slideCount,
       isNew: true,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("PPT generation error:", error);
-    return NextResponse.json({ error: "Failed to generate presentation" }, { status: 500 });
+    const status = error.message === "Presentation limit reached" ? 403 : 500;
+    return NextResponse.json({ error: error.message || "Failed to generate presentation" }, { status });
   }
 };

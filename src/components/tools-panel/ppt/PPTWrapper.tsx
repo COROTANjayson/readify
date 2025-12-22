@@ -50,7 +50,7 @@ const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: bo
 
       // Refresh the presentation
       utils.presentation.getPresentation.invalidate({ fileId });
-
+      utils.file.getFileById.invalidate({ fileId });
       // Auto-download if new presentation
       if (data.isNew && data.downloadUrl) {
         window.location.href = data.downloadUrl;
