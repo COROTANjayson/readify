@@ -3,6 +3,7 @@ import { CheckCircle2, HelpCircle, Lightbulb, Loader2, Sparkles } from "lucide-r
 import { toast } from "sonner";
 
 import { trpc } from "@/app/_trpc/client";
+import { useFileStore } from "@/app/store/fileStore";
 import ToolsUsageInfo from "../ToolsUsageInfo";
 
 interface InsightWrapperProps {
@@ -13,6 +14,7 @@ interface InsightWrapperProps {
 const InsightWrapper = ({ fileId, isSubscribed }: InsightWrapperProps) => {
   console.log(isSubscribed);
   const utils = trpc.useUtils();
+  const { canInsight } = useFileStore();
 
   const { data: insightData, isLoading: isFetching } = trpc.docInsight.getDocInsightByFileId.useQuery(
     { fileId },
@@ -47,6 +49,7 @@ const InsightWrapper = ({ fileId, isSubscribed }: InsightWrapperProps) => {
     },
     onSuccess: (data) => {
       utils.docInsight.getDocInsightByFileId.invalidate({ fileId });
+      utils.file.getFileById.invalidate({ fileId });
 
       if (data.isNew) {
         toast.success("Insight generated successfully!");
@@ -120,7 +123,7 @@ const InsightWrapper = ({ fileId, isSubscribed }: InsightWrapperProps) => {
         {!insightData && !isFetching && (
           <button
             onClick={handleGenerate}
-            disabled={isLoading}
+            disabled={isLoading || !canInsight()}
             className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg hover:from-blue-600 hover:to-purple-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (

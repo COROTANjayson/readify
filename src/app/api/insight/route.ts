@@ -37,6 +37,11 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
+    // 🚨 Insight limit check (fast fail)
+    if (file.insightCount >= file.insightLimit) {
+      return NextResponse.json({ error: "Insight limit reached for this file" }, { status: 403 });
+    }
+
     const existingInsight = await db.documentInsight.findUnique({
       where: {
         fileId,
@@ -56,6 +61,26 @@ export const POST = async (req: NextRequest) => {
         isNew: false,
       });
     }
+
+    // 🔒 Reserve insight slot (atomic, fast transaction)
+    await db.$transaction(async (tx) => {
+      const fileInTx = await tx.file.findUnique({
+        where: { id: fileId },
+      });
+
+      if (!fileInTx) throw new Error("File not found");
+
+      if (fileInTx.insightCount >= fileInTx.insightLimit) {
+        throw new Error("INSIGHT_LIMIT_REACHED");
+      }
+
+      await tx.file.update({
+        where: { id: fileId },
+        data: {
+          insightCount: { increment: 1 },
+        },
+      });
+    });
 
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
@@ -173,7 +198,7 @@ Respond ONLY with valid JSON, no additional text.`,
       updatedAt: savedInsight.updatedAt,
       isNew: !existingInsight,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating insight:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
