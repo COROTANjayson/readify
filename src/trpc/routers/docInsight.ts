@@ -13,12 +13,15 @@ export const docInsightRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const insight = await db.documentInsight.findUnique({
+      const insight = await db.documentInsight.findFirst({
         where: {
           id: input.id,
         },
         include: {
           file: true,
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       });
 
@@ -46,12 +49,15 @@ export const docInsightRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const insight = await db.documentInsight.findUnique({
+      const insight = await db.documentInsight.findFirst({
         where: {
           fileId: input.fileId,
         },
         include: {
           file: true,
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       });
 

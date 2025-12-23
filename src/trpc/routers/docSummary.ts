@@ -48,9 +48,12 @@ export const docSummaryRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const summary = await db.documentSummary.findUnique({
+      const summary = await db.documentSummary.findFirst({
         where: { fileId: input.fileId },
         include: { File: true },
+        orderBy: {
+          createdAt: "desc",
+        },
       });
 
       // ✅ NOT FOUND = valid state

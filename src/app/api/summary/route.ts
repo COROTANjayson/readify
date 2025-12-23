@@ -7,8 +7,11 @@ import { generateText } from "ai";
 
 import { db } from "@/db";
 import { getPineconeClient } from "@/lib/pinecone";
+import { reserveUsage, UsageLimitError } from "@/lib/tools/usageGuard";
 
 export const POST = async (req: NextRequest) => {
+  let rollback: (() => Promise<void>) | null = null;
+
   try {
     const body = await req.json();
     const { getUser } = getKindeServerSession();
@@ -18,7 +21,7 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { fileId, regenerate = false } = body;
+    const { fileId } = body;
     const userId = user.id;
 
     if (!fileId) {
@@ -37,40 +40,27 @@ export const POST = async (req: NextRequest) => {
       where: { fileId },
     });
 
-    if (existingSummary && !regenerate) {
-      return NextResponse.json({
-        summary: existingSummary.summary,
-        isNew: false,
-        usage: {
-          summarizeCount: file.summarizeCount,
-          summarizeLimit: file.summarizeLimit,
-        },
-      });
-    }
+    // Update usage count and check limits
+    const reservation = await reserveUsage({
+      fileId,
+      countField: "summarizeCount",
+      limitField: "summarizeLimit",
+    });
+    rollback = reservation.rollback;
 
-    if (file.summarizeCount >= file.summarizeLimit) {
-      return NextResponse.json(
-        {
-          error: "Summarize limit reached",
-          code: "SUMMARIZE_LIMIT_EXCEEDED",
-        },
-        { status: 403 }
-      );
-    }
+    // Generate summary
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
     });
-
     const pinecone = await getPineconeClient();
     const pineconeIndex = pinecone.Index("summaraize");
-
     const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
       pineconeIndex,
       namespace: file.id,
     });
 
     const results = await vectorStore.similaritySearch("summary overview main points key information", 10);
-    console.log("similaritySearch", results.map((r) => r.pageContent).join("\n\n"));
+
     if (results.length === 0) {
       return NextResponse.json({ error: "No content found for this document" }, { status: 404 });
     }
@@ -90,48 +80,57 @@ export const POST = async (req: NextRequest) => {
       ],
     });
 
-    /* ─────────────────────────────
-       5️⃣ FAST TRANSACTION (SAVE + INCREMENT)
-    ───────────────────────────── */
-    const [updatedFile, savedSummary] = await db.$transaction([
-      db.file.update({
-        where: { id: fileId },
-        data: {
-          summarizeCount: { increment: 1 },
-        },
-      }),
+    const savedSummary = existingSummary
+      ? await db.documentSummary.update({
+          where: { fileId },
+          data: { summary: text },
+        })
+      : await db.documentSummary.create({
+          data: {
+            summary: text,
+            fileId,
+            userId,
+          },
+        });
 
-      existingSummary
-        ? db.documentSummary.update({
-            where: { fileId },
-            data: { summary: text },
-          })
-        : db.documentSummary.create({
-            data: {
-              summary: text,
-              fileId,
-              userId,
-            },
-          }),
-    ]);
+    const updatedFile = await db.file.findUnique({
+      where: { id: fileId },
+      select: {
+        summarizeCount: true,
+        summarizeLimit: true,
+        name: true,
+      },
+    });
 
-    /* ─────────────────────────────
-       6️⃣ Return response
-    ───────────────────────────── */
     return NextResponse.json({
       summary: savedSummary.summary,
-      fileId: file.id,
-      fileName: file.name,
+      fileId,
+      fileName: updatedFile?.name,
       id: savedSummary.id,
       createdAt: savedSummary.createdAt,
       updatedAt: savedSummary.updatedAt,
       isNew: !existingSummary,
       usage: {
-        summarizeCount: updatedFile.summarizeCount,
-        summarizeLimit: updatedFile.summarizeLimit,
+        summarizeCount: updatedFile?.summarizeCount,
+        summarizeLimit: updatedFile?.summarizeLimit,
       },
     });
   } catch (error) {
+    // Roll back incase generate error happen
+    if (rollback) {
+      await rollback();
+    }
+
+    if (error instanceof UsageLimitError) {
+      return NextResponse.json(
+        {
+          error: "Summarize limit reached",
+          code: "SUMMARIZE_LIMIT_EXCEEDED",
+        },
+        { status: 403 }
+      );
+    }
+
     console.error("Error generating summary:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

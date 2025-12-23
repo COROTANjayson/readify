@@ -9,72 +9,47 @@ import PptxGenJS from "pptxgenjs";
 
 import { db } from "@/db";
 import { getPineconeClient } from "@/lib/pinecone";
+import { reserveUsage, UsageLimitError } from "@/lib/tools/usageGuard";
 
 export const POST = async (req: NextRequest) => {
+  let rollback: (() => Promise<void>) | null = null;
+
   try {
     const body = await req.json();
     const { getUser } = getKindeServerSession();
     const user = await getUser();
 
-    if (!user || !user.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id: userId } = user;
-    const { fileId, slideCount = 5, regenerate = false } = body;
+    const { fileId, slideCount = 5 } = body;
+    const userId = user.id;
 
     if (!fileId) {
       return NextResponse.json({ error: "File ID is required" }, { status: 400 });
     }
 
-    // Verify file ownership
     const file = await db.file.findFirst({
       where: { id: fileId, userId },
     });
+
     if (!file) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // Check for existing presentation
-    const existingPresentation = await db.presentation.findFirst({
-      where: { fileId, userId },
-      orderBy: { createdAt: "desc" },
+    const reservation = await reserveUsage({
+      fileId,
+      countField: "presentationCount",
+      limitField: "presentationLimit",
     });
 
-    if (existingPresentation && !regenerate) {
-      return NextResponse.json({
-        presentationId: existingPresentation.id,
-        downloadUrl: existingPresentation.downloadUrl,
-        fileName: existingPresentation.fileName,
-        slideCount: existingPresentation.slideCount,
-        isNew: false,
-        exists: true,
-      });
-    }
+    rollback = reservation.rollback;
 
-    // If regenerating, delete the old presentation
-    if (existingPresentation && regenerate) {
-      await db.presentation.delete({ where: { id: existingPresentation.id } });
-    }
-
-    // 🚨 Step 1: Reserve presentation slot (transaction)
-    await db.$transaction(async (tx) => {
-      const fileInTx = await tx.file.findUnique({ where: { id: fileId } });
-      if (!fileInTx) throw new Error("File not found");
-      if (fileInTx.presentationCount >= fileInTx.presentationLimit) {
-        throw new Error("Presentation limit reached");
-      }
-      // Increment to reserve slot
-      await tx.file.update({
-        where: { id: fileId },
-        data: { presentationCount: { increment: 1 } },
-      });
+    const embeddings = new OpenAIEmbeddings({
+      openAIApiKey: process.env.OPENAI_API_KEY,
     });
 
-    // Step 2: Generate PPT content
-
-    // Get document content from Pinecone
-    const embeddings = new OpenAIEmbeddings({ openAIApiKey: process.env.OPENAI_API_KEY });
     const pinecone = await getPineconeClient();
     const pineconeIndex = pinecone.Index("summaraize");
 
@@ -94,7 +69,6 @@ export const POST = async (req: NextRequest) => {
 
     const documentContent = results.map((r) => r.pageContent).join("\n\n");
 
-    // Generate presentation JSON
     const { text } = await generateText({
       model: openai("gpt-4-turbo-preview"),
       temperature: 0.4,
@@ -123,7 +97,8 @@ Requirements:
 - Title slide first
 - 3-5 bullet points per slide
 - Logical flow
-- Use professional language
+- Professional tone
+
 Return ONLY JSON.`,
         },
       ],
@@ -133,13 +108,13 @@ Return ONLY JSON.`,
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim();
+
     const presentationData = JSON.parse(cleanedResponse);
 
     if (!presentationData.title || !Array.isArray(presentationData.slides)) {
-      return NextResponse.json({ error: "Invalid presentation structure" }, { status: 500 });
+      throw new Error("INVALID_PRESENTATION_JSON");
     }
 
-    // Generate PPTX
     const pptx = new PptxGenJS();
     pptx.author = user.given_name || "User";
     pptx.company = "Summaraize";
@@ -170,20 +145,30 @@ Return ONLY JSON.`,
     for (let i = 1; i < presentationData.slides.length; i++) {
       const slideData = presentationData.slides[i];
       const slide = pptx.addSlide();
-      slide.background = { color: "FFFFFF" };
-      slide.addText(slideData.title, { x: 0.5, y: 0.5, w: 9, h: 0.75, fontSize: 32, bold: true, color: "1E293B" });
 
-      const bullets = slideData.content.map((point: string) => ({
-        text: point,
-        options: { bullet: true, fontSize: 18, color: "334155" },
-      }));
-      slide.addText(bullets, { x: 1, y: 1.5, w: 8, h: 4 });
-      slide.addText(`${i + 1}`, { x: 9, y: 5.2, w: 0.5, h: 0.3, fontSize: 12, color: "94A3B8", align: "right" });
+      slide.addText(slideData.title, {
+        x: 0.5,
+        y: 0.5,
+        w: 9,
+        h: 0.75,
+        fontSize: 32,
+        bold: true,
+      });
+
+      slide.addText(
+        slideData.content.map((point: string) => ({
+          text: point,
+          options: { bullet: true, fontSize: 18 },
+        })),
+        { x: 1, y: 1.5, w: 8, h: 4 }
+      );
     }
 
-    const pptxData = await pptx.write({ outputType: "base64" });
+    const pptxData = (await pptx.write({ outputType: "base64" })) as string;
 
-    // Step 3: Save presentation record
+    /**
+     * 💾 Save presentation record
+     */
     const presentation = await db.presentation.create({
       data: {
         fileId,
@@ -191,7 +176,7 @@ Return ONLY JSON.`,
         fileName: `${file.name.replace(/\.[^/.]+$/, "")}_presentation.pptx`,
         slideCount,
         content: JSON.stringify(presentationData),
-        pptxData: pptxData as string,
+        pptxData,
         downloadUrl: `/api/download-ppt/${fileId}`,
       },
     });
@@ -203,9 +188,14 @@ Return ONLY JSON.`,
       slideCount: presentation.slideCount,
       isNew: true,
     });
-  } catch (error: any) {
+  } catch (error) {
+    if (rollback) {
+      await rollback();
+    }
+    if (error instanceof UsageLimitError) {
+      return NextResponse.json({ error: "Presentation limit reached" }, { status: 403 });
+    }
     console.error("PPT generation error:", error);
-    const status = error.message === "Presentation limit reached" ? 403 : 500;
-    return NextResponse.json({ error: error.message || "Failed to generate presentation" }, { status });
+    return NextResponse.json({ error: "Failed to generate presentation" }, { status: 500 });
   }
 };

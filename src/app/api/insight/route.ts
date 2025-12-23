@@ -7,47 +7,38 @@ import { generateText } from "ai";
 
 import { db } from "@/db";
 import { getPineconeClient } from "@/lib/pinecone";
+import { reserveUsage, UsageLimitError } from "@/lib/tools/usageGuard";
 
 export const POST = async (req: NextRequest) => {
+  let rollback: (() => Promise<void>) | null = null;
+
   try {
     const body = await req.json();
     const { getUser } = getKindeServerSession();
     const user = await getUser();
 
-    if (!user || !user.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id: userId } = user;
     const { fileId, regenerate = false } = body;
+    const userId = user.id;
 
     if (!fileId) {
       return NextResponse.json({ error: "File ID is required" }, { status: 400 });
     }
 
-    // Verify file ownership
     const file = await db.file.findFirst({
-      where: {
-        id: fileId,
-        userId,
-      },
+      where: { id: fileId, userId },
     });
 
     if (!file) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // 🚨 Insight limit check (fast fail)
-    if (file.insightCount >= file.insightLimit) {
-      return NextResponse.json({ error: "Insight limit reached for this file" }, { status: 403 });
-    }
-
     const existingInsight = await db.documentInsight.findUnique({
-      where: {
-        fileId,
-      },
+      where: { fileId },
     });
-
     if (existingInsight && !regenerate) {
       return NextResponse.json({
         insight: existingInsight.insight,
@@ -62,25 +53,12 @@ export const POST = async (req: NextRequest) => {
       });
     }
 
-    // 🔒 Reserve insight slot (atomic, fast transaction)
-    await db.$transaction(async (tx) => {
-      const fileInTx = await tx.file.findUnique({
-        where: { id: fileId },
-      });
-
-      if (!fileInTx) throw new Error("File not found");
-
-      if (fileInTx.insightCount >= fileInTx.insightLimit) {
-        throw new Error("INSIGHT_LIMIT_REACHED");
-      }
-
-      await tx.file.update({
-        where: { id: fileId },
-        data: {
-          insightCount: { increment: 1 },
-        },
-      });
+    const reservation = await reserveUsage({
+      fileId,
+      countField: "insightCount",
+      limitField: "insightLimit",
     });
+    rollback = reservation.rollback;
 
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
@@ -109,44 +87,25 @@ export const POST = async (req: NextRequest) => {
       messages: [
         {
           role: "system",
-          content: `You are an expert document analyst specializing in extracting deep insights, patterns, and actionable intelligence from documents. You provide strategic analysis that goes beyond surface-level summaries.`,
+          content:
+            "You are an expert document analyst specializing in extracting deep insights, patterns, and actionable intelligence from documents.",
         },
         {
           role: "user",
-          content: `Analyze the following document content and provide comprehensive insights in JSON format. Respond ONLY with pure JSON. Do NOT include code fences, markdown, or backticks.
+          content: `Analyze the following document content and provide comprehensive insights in JSON format. Respond ONLY with pure JSON.
 
 DOCUMENT CONTENT:
 ${results.map((r) => r.pageContent).join("\n\n")}
 
 Generate a JSON response with the following structure:
 {
-  "insight": "A detailed HTML-formatted analytical insight (3-4 paragraphs) that identifies patterns, connections, implications, and deeper meaning. Use <p>, <strong>, <em>, <h3> tags.",
-  "keyFindings": [
-    "First major finding or pattern identified",
-    "Second major finding or pattern identified",
-    "Third major finding or pattern identified"
-  ],
-  "actionItems": [
-    "Specific actionable recommendation based on the analysis",
-    "Another practical action item",
-    "Additional suggestion for next steps"
-  ],
-  "questions": [
-    "Thought-provoking question raised by the content",
-    "Another question for deeper exploration",
-    "Question about implications or applications"
-  ]
+  "insight": "HTML-formatted analytical insight",
+  "keyFindings": [],
+  "actionItems": [],
+  "questions": []
 }
 
-Focus on:
-- Identifying underlying patterns and themes
-- Drawing connections between different sections
-- Highlighting implications and consequences
-- Suggesting practical applications
-- Raising thought-provoking questions
-- Providing strategic recommendations
-
-Respond ONLY with valid JSON, no additional text.`,
+Respond ONLY with valid JSON.`,
         },
       ],
     });
@@ -154,37 +113,30 @@ Respond ONLY with valid JSON, no additional text.`,
     let parsedInsight;
     try {
       parsedInsight = JSON.parse(text);
-    } catch (parseError) {
-      console.error("Failed to parse insight JSON:", parseError);
-      return NextResponse.json({ error: "Failed to generate structured insight" }, { status: 500 });
+    } catch {
+      throw new Error("INVALID_INSIGHT_JSON");
     }
-
-    let savedInsight;
-    if (existingInsight) {
-      savedInsight = await db.documentInsight.update({
-        where: {
-          fileId,
-        },
-        data: {
-          insight: parsedInsight.insight,
-          keyFindings: parsedInsight.keyFindings || [],
-          actionItems: parsedInsight.actionItems || [],
-          questions: parsedInsight.questions || [],
-          updatedAt: new Date(),
-        },
-      });
-    } else {
-      savedInsight = await db.documentInsight.create({
-        data: {
-          insight: parsedInsight.insight,
-          keyFindings: parsedInsight.keyFindings || [],
-          actionItems: parsedInsight.actionItems || [],
-          questions: parsedInsight.questions || [],
-          userId,
-          fileId,
-        },
-      });
-    }
+    const savedInsight = existingInsight
+      ? await db.documentInsight.update({
+          where: { fileId },
+          data: {
+            insight: parsedInsight.insight,
+            keyFindings: parsedInsight.keyFindings || [],
+            actionItems: parsedInsight.actionItems || [],
+            questions: parsedInsight.questions || [],
+            updatedAt: new Date(),
+          },
+        })
+      : await db.documentInsight.create({
+          data: {
+            insight: parsedInsight.insight,
+            keyFindings: parsedInsight.keyFindings || [],
+            actionItems: parsedInsight.actionItems || [],
+            questions: parsedInsight.questions || [],
+            userId,
+            fileId,
+          },
+        });
 
     return NextResponse.json({
       insight: savedInsight.insight,
@@ -198,7 +150,14 @@ Respond ONLY with valid JSON, no additional text.`,
       updatedAt: savedInsight.updatedAt,
       isNew: !existingInsight,
     });
-  } catch (error: any) {
+  } catch (error) {
+    if (rollback) {
+      await rollback();
+    }
+
+    if (error instanceof UsageLimitError) {
+      return NextResponse.json({ error: "Insight limit reached for this file" }, { status: 403 });
+    }
     console.error("Error generating insight:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
