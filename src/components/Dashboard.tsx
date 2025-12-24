@@ -1,20 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { format } from "date-fns";
-import { Ghost, Loader2, MessageSquare, Plus, Trash } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Files, Ghost, Sparkles } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 
 import { trpc } from "@/app/_trpc/client";
 import { getUserSubscriptionPlan } from "@/lib/stripe";
-import { Button } from "./ui/button";
+import { FileCard } from "./FileCard";
 import UploadButton from "./UploadButton";
 
 interface PageProps {
   subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>;
 }
+
 const Dashboard = ({ subscriptionPlan }: PageProps) => {
+  const router = useRouter();
   const [currentlyDeletingFile, setCurrentlyDeletingFile] = useState<string | null>(null);
   const utils = trpc.useContext();
 
@@ -33,71 +34,75 @@ const Dashboard = ({ subscriptionPlan }: PageProps) => {
   });
 
   return (
-    <main className="mx-auto max-w-7xl md:p-10">
-      <div className="mt-8 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0">
-        <h1 className="mb-3 font-bold text-5xl text-gray-900">My Files</h1>
+    <main className="min-h-screen bg-background">
+      <div className="mx-auto max-w-7xl px-4 py-8 md:px-10 md:py-12">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-800   to-primary p-6 shadow-xl md:p-8">
+          <div className="absolute inset-0 bg-black/10"></div>
+    
+          <div className="relative flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-white/20 p-2 backdrop-blur-sm">
+                <Files className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="font-bold text-3xl text-white">My Files</h1>
+                <p className="mt-0.5 text-blue-100 text-sm">
+                  {files?.length || 0} {files?.length === 1 ? "document" : "documents"} uploaded
+                </p>
+              </div>
+            </div>
+            <UploadButton isSubscribed={subscriptionPlan.isSubscribed} />
+          </div>
+        </div>
 
-        <UploadButton isSubscribed={subscriptionPlan.isSubscribed} />
-      </div>
-
-      {files && files?.length !== 0 ? (
-        <ul className="mt-8 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3">
-          {files
-            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            .map((file) => (
-              <li
-                key={file.id}
-                className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg"
-              >
-                <Link href={`/dashboard/${file.id}`} className="flex flex-col gap-2">
-                  <div className="pt-6 px-6 flex w-full items-center justify-between space-x-6">
-                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />
-                    <div className="flex-1 truncate">
-                      <div className="flex items-center space-x-3">
-                        <h3 className="truncate text-lg font-medium text-zinc-900">{file.name}</h3>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-
-                <div className="px-6 mt-4 grid grid-cols-3 place-items-center py-2 gap-6 text-xs text-zinc-500">
-                  <div className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    {format(new Date(file.createdAt), "MMM yyyy")}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    mocked
-                  </div>
-
-                  <Button
-                    onClick={() => {
+        {/* Files Grid */}
+        {files && files?.length !== 0 ? (
+          <div className="mt-10">
+            <div className="mb-6 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-indigo-600" />
+              <h2 className="font-semibold text-xl text-gray-900">Recent Documents</h2>
+            </div>
+            <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {files
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                .map((file) => (
+                  <FileCard
+                    key={file.id}
+                    file={file}
+                    onDelete={() => {
                       deleteFile({ id: file.id });
                     }}
-                    size="sm"
-                    className="w-full"
-                    variant="destructive"
-                  >
-                    {currentlyDeletingFile === file.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Trash className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </li>
-            ))}
-        </ul>
-      ) : isLoading ? (
-        <Skeleton height={100} className="my-2" count={3} />
-      ) : (
-        <div className="mt-16 flex flex-col items-center gap-2">
-          <Ghost className="h-8 w-8 text-zinc-800" />
-          <h3 className="font-semibold text-xl">Pretty empty around here</h3>
-          <p>Let&apos;s upload your first PDF.</p>
-        </div>
-      )}
+                    isDeleting={currentlyDeletingFile === file.id}
+                    onFileClick={() => {
+                      router.push(`/dashboard/${file.id}`);
+                    }}
+                  />
+                ))}
+            </ul>
+          </div>
+        ) : isLoading ? (
+          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Skeleton height={200} className="rounded-2xl" />
+            <Skeleton height={200} className="rounded-2xl" />
+            <Skeleton height={200} className="rounded-2xl" />
+          </div>
+        ) : (
+          <div className="mt-20 flex flex-col items-center gap-6">
+            <div className="rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 p-8">
+              <Ghost className="h-16 w-16 text-indigo-600" />
+            </div>
+            <div className="text-center">
+              <h3 className="font-bold text-2xl text-gray-900">No files yet</h3>
+              <p className="mt-2 text-gray-600 text-lg">
+                Upload your first PDF to get started with your document library
+              </p>
+            </div>
+            <div className="mt-4">
+              <UploadButton isSubscribed={subscriptionPlan.isSubscribed} />
+            </div>
+          </div>
+        )}
+      </div>
     </main>
   );
 };

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Cloud, File, Loader2 } from "lucide-react";
+import { Cloud, File, FileUp, Loader2 } from "lucide-react";
 import Dropzone from "react-dropzone";
 import { toast } from "sonner";
 
@@ -135,7 +135,11 @@ const UploadButton = ({ isSubscribed }: { isSubscribed: boolean }) => {
       }}
     >
       <DialogTrigger onClick={() => setIsOpen(true)} asChild>
-        <Button>Upload PDF</Button>
+        <Button size={"lg"} className="bg-secondary hover:bg-secondary/90 text-primary">
+          {" "}
+          <FileUp />
+          Upload PDF
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
