@@ -1,10 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
-import { CheckCircle2, HelpCircle, Lightbulb, Loader2, Sparkles } from "lucide-react";
+import { CheckCircle2, HelpCircle, Lightbulb, Loader2, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { trpc } from "@/app/_trpc/client";
 import { useFileStore } from "@/app/store/fileStore";
-import ToolsUsageInfo from "../ToolsUsageInfo";
+import { Button } from "@/components/ui/button";
+import ToolSectionHeader from "../toolsContent/ToolSectionHeader";
+import ToolsSectionWrapper from "../toolsContent/ToolsSectionWrapper";
+import ToolsUsageInfo from "../toolsContent/ToolsUsageInfo";
 
 interface InsightWrapperProps {
   fileId: string;
@@ -20,13 +23,9 @@ const InsightWrapper = ({ fileId, isSubscribed }: InsightWrapperProps) => {
     { fileId },
     {
       enabled: !!fileId,
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5, 
+      refetchOnWindowFocus: false, 
       retry: false,
-      // onError: (error: any) => {
-      //   if (error?.data?.code !== "NOT_FOUND") {
-      //     toast.error("Failed to load insight");
-      //   }
-      // },
     }
   );
 
@@ -91,40 +90,41 @@ const InsightWrapper = ({ fileId, isSubscribed }: InsightWrapperProps) => {
   const showEmptyState = !insightData && !isFetching && !isLoading;
 
   return (
-    <div className="p-4 md:p-6">
+    <ToolsSectionWrapper>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-purple-500" />
-          Generate Insight
-        </h3>
-        <ToolsUsageInfo type="insight" />
-
-        {insightData && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleRegenerate}
-              disabled={isLoading || isDeleting}
-              className="text-sm text-blue-600 hover:text-blue-700 disabled:opacity-50 transition"
-            >
-              {isLoading ? "Regenerating..." : "Regenerate"}
-            </button>
-            <button
-              onClick={handleDelete}
-              disabled={isLoading || isDeleting}
-              className="text-sm text-red-600 hover:text-red-700 disabled:opacity-50 transition"
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </button>
-          </div>
-        )}
+        <ToolSectionHeader
+          title="Generate Insight"
+          description="Analyze your document to uncover key patterns, trends, and actionable insights."
+          toolType="insight"
+        />
       </div>
-
+      {insightData && (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            onClick={handleRegenerate}
+            disabled={isLoading || isDeleting}
+            className="text-sm disabled:opacity-50 transition"
+          >
+            <Sparkles className="w-4 h-4 mr-1" />
+            {isLoading ? "Regenerating..." : "Regenerate"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleDelete}
+            disabled={isLoading || isDeleting}
+            className="text-sm text-red-600 hover:text-red-700 disabled:opacity-50 transition"
+          >
+            <Trash2 className="w-4 h-4 mr-1" />
+            {isDeleting ? "Deleting..." : "Delete"}
+          </Button>
+        </div>
+      )}
       <div className="space-y-4">
         {!insightData && !isFetching && (
-          <button
+          <Button
             onClick={handleGenerate}
             disabled={isLoading || !canInsight()}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg hover:from-blue-600 hover:to-purple-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-6 rounded-lg hover:from-blue-600 hover:to-purple-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
@@ -137,7 +137,7 @@ const InsightWrapper = ({ fileId, isSubscribed }: InsightWrapperProps) => {
                 Generate Insight
               </>
             )}
-          </button>
+          </Button>
         )}
 
         {isFetching && !insightData && (
@@ -242,7 +242,7 @@ const InsightWrapper = ({ fileId, isSubscribed }: InsightWrapperProps) => {
           </div>
         )}
       </div>
-    </div>
+    </ToolsSectionWrapper>
   );
 };
 

@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { Eye, FileText, Loader2, RefreshCw } from "lucide-react";
+import { AlertCircle, Eye, FileText, Loader2, RefreshCw, Sparkles } from "lucide-react";
 
 import { trpc } from "@/app/_trpc/client";
 import { useFileStore } from "@/app/store/fileStore";
 import { Button } from "@/components/ui/button";
-import ToolsUsageInfo from "../ToolsUsageInfo";
+import ToolSectionHeader from "../toolsContent/ToolSectionHeader";
+import ToolsSectionWrapper from "../toolsContent/ToolsSectionWrapper";
 
 interface SummaryResponse {
   summary: string;
@@ -21,13 +22,11 @@ interface SummaryResponse {
 }
 
 const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {
-  console.log(isSubscribed);
   const router = useRouter();
   const [regenerate, setRegenerate] = useState(false);
   const utils = trpc.useUtils();
   const { canSummarize } = useFileStore();
 
-  // Check if summary already exists
   const {
     data: existingSummary,
     isLoading: isCheckingExisting,
@@ -51,7 +50,6 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
     },
 
     onSuccess: (data) => {
-      // increment("summarizeCount"); // ✅ update usage
       refetchSummary();
       utils.file.getFileById.invalidate({ fileId });
       router.push(`/editor/${data.id}`);
@@ -63,88 +61,125 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
     },
   });
 
+  // Loading state
   if (isCheckingExisting) {
     return (
-      <div className="p-6 flex justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+      <div className="p-6 flex flex-col items-center justify-center gap-3 min-h-[200px]">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        <p className="text-sm text-gray-500">Checking for existing summary...</p>
       </div>
     );
   }
 
-  // ================= EXISTING SUMMARY =================
-  if (existingSummary) {
-    return (
-      <div className="p-4 md:p-6 space-y-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Document Summary</h3>
-          <ToolsUsageInfo type="summarize" />
-        </div>
-
-        <div className="border border-green-200 bg-green-50 rounded-lg p-4">
-          <div className="flex gap-3">
-            <FileText className="h-5 w-5 text-green-600 mt-1" />
-            <div>
-              <p className="font-medium text-green-900">Summary Already Exists</p>
-              <p className="text-sm text-green-700">
-                Created on {new Date(existingSummary.createdAt).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Button onClick={() => router.push(`/editor/${existingSummary.id}`)}>
-            <Eye className="h-4 w-4" />
-            View Summary
-          </Button>
-
-          <Button
-            variant="outline"
-            disabled={isPending || !canSummarize()}
-            onClick={() => {
-              setRegenerate(true);
-              generateSummary();
-            }}
-          >
-            {!canSummarize() ? "Limit reached" : isPending ? "Regenerating..." : "Regenerate"}
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // ================= NO SUMMARY =================
   return (
-    <div className="p-4 md:p-6 space-y-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Generate Document Summary</h3>
-        <ToolsUsageInfo type="summarize" />
-      </div>
-      <div className="border rounded-lg p-4 space-y-3">
-        <p className="text-sm text-gray-600">Generate an AI-powered summary of your PDF document.</p>
+    <ToolsSectionWrapper>
+      {/* Header (always the same) */}
+      <ToolSectionHeader
+        title="Generate Summary"
+        description="Create an AI-powered summary of your document"
+        toolType="summarize"
+      />
 
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={regenerate}
-            onChange={(e) => setRegenerate(e.target.checked)}
-            disabled={isPending}
-          />
-          Regenerate if summary already exists
-        </label>
-      </div>
+      <div className="space-y-5">
+        {existingSummary ? (
+          <>
+            {/* Existing summary card */}
+            <div className="relative overflow-hidden rounded-md border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5">
+              <div className="flex gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md bg-emerald-500 shadow-sm">
+                  <FileText className="h-6 w-6 text-background" />
+                </div>
 
-      <button
-        onClick={() => generateSummary()}
-        disabled={isPending || !canSummarize()}
-        className="w-full bg-blue-500 text-white py-3 rounded-lg
-          hover:bg-blue-600 transition
-          disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isPending ? "Generating Summary..." : !canSummarize() ? "Summary limit reached" : "Generate Summary"}
-      </button>
-    </div>
+                <div className="flex-1 space-y-1">
+                  <p className="font-semibold text-emerald-900">Summary Generated Successfully</p>
+                  <p className="text-sm text-emerald-700">
+                    Created{" "}
+                    {new Date(existingSummary.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Button onClick={() => router.push(`/editor/${existingSummary.id}`)} className="gap-2 px-4 py-6">
+                <Eye className="h-4 w-4" />
+                View Summary
+              </Button>
+
+              <Button
+                variant="outline"
+                disabled={isPending || !canSummarize()}
+                onClick={() => {
+                  setRegenerate(true);
+                  generateSummary();
+                }}
+                className="gap-2 px-4 py-6"
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Regenerating...
+                  </>
+                ) : !canSummarize() ? (
+                  <>
+                    <AlertCircle className="h-4 w-4" />
+                    Limit Reached
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" />
+                    Regenerate
+                  </>
+                )}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Info */}
+            <div className="rounded-md border bg-primary-foreground p-5">
+              <div className="flex gap-3">
+                <Sparkles className="h-5 w-5 text-primary mt-0.5" />
+                <p className="text-sm text-primary/70">
+                  Generate a concise, AI-powered summary that captures the key points and main ideas of your document.
+                </p>
+              </div>
+            </div>
+
+            {/* Generate */}
+            <Button
+              onClick={() => generateSummary()}
+              disabled={isPending || !canSummarize()}
+              className="w-full gap-2 py-6"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Generating Summary...
+                </>
+              ) : !canSummarize() ? (
+                <>
+                  <AlertCircle className="h-5 w-5" />
+                  Summary Limit Reached
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-5 w-5" />
+                  Generate Summary
+                </>
+              )}
+            </Button>
+          </>
+        )}
+      </div>
+    </ToolsSectionWrapper>
   );
 };
-
 export default SummaryWrapper;
