@@ -12,8 +12,8 @@ const ToolButton = ({ tool, selectedTools, onSelect }: any) => (
     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition text-left 
       ${
         selectedTools === tool.id
-          ? "bg-blue-50 text-blue-600 border-2 border-blue-500"
-          : "text-gray-700 hover:bg-gray-50 border-2 border-transparent"
+          ? "bg-primary-foreground text-primary border-2 border-primary"
+          : "text-gray-700 hover:bg-primary-foreground border-2 border-transparent"
       }
     `}
   >

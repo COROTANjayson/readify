@@ -25,7 +25,7 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(({ message, isNextMessa
           "flex-shrink-0 flex items-center justify-center transition-opacity duration-200",
           "w-8 h-8 rounded-full",
           {
-            "bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm": message.isUserMessage,
+            "bg-primary shadow-sm": message.isUserMessage,
             "bg-gradient-to-br from-purple-500 to-indigo-600 shadow-sm": !message.isUserMessage,
             "opacity-0": isNextMessageSamePerson,
             "opacity-100": !isNextMessageSamePerson,
@@ -52,7 +52,7 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(({ message, isNextMessa
             "relative px-4 py-2.5 rounded-2xl shadow-sm transition-all duration-200",
             "group-hover:shadow-md",
             {
-              "bg-gradient-to-br from-blue-500 to-blue-600 text-white": message.isUserMessage,
+              "bg-primary/90 text-white": message.isUserMessage,
               "bg-white border border-gray-200 text-gray-900": !message.isUserMessage,
               "rounded-tr-md": !isNextMessageSamePerson && message.isUserMessage,
               "rounded-tl-md": !isNextMessageSamePerson && !message.isUserMessage,
