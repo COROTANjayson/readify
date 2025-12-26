@@ -1,8 +1,8 @@
 import { forwardRef } from "react";
 import { format } from "date-fns";
+import { Bot, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
-import { Icons } from "@/components/Icons";
 import { cn } from "@/lib/utils";
 import { ExtendedMessage } from "@/types/message";
 
@@ -15,63 +15,97 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(({ message, isNextMessa
   return (
     <div
       ref={ref}
-      className={cn("flex items-end", {
-        "justify-end": message.isUserMessage,
+      className={cn("flex items-start gap-3 group", {
+        "flex-row-reverse": message.isUserMessage,
       })}
     >
+      {/* Avatar */}
       <div
-        className={cn("relative flex h-6 w-6 aspect-square items-center justify-center", {
-          "order-2 bg-blue-600 rounded-sm": message.isUserMessage,
-          "order-1 bg-zinc-800 rounded-sm": !message.isUserMessage,
-          invisible: isNextMessageSamePerson,
-        })}
+        className={cn(
+          "flex-shrink-0 flex items-center justify-center transition-opacity duration-200",
+          "w-8 h-8 rounded-full",
+          {
+            "bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm": message.isUserMessage,
+            "bg-gradient-to-br from-purple-500 to-indigo-600 shadow-sm": !message.isUserMessage,
+            "opacity-0": isNextMessageSamePerson,
+            "opacity-100": !isNextMessageSamePerson,
+          }
+        )}
       >
         {message.isUserMessage ? (
-          <Icons.user className="fill-zinc-200 text-zinc-200 h-3/4 w-3/4" />
+          <User className="w-5 h-5 text-white" strokeWidth={2.5} />
         ) : (
-          <Icons.logo className="fill-zinc-300 h-3/4 w-3/4" />
+          <Bot className="w-5 h-5 text-white" strokeWidth={2.5} />
         )}
       </div>
 
+      {/* Message Content */}
       <div
-        className={cn("flex flex-col space-y-2 text-base max-w-md mx-2", {
-          "order-1 items-end": message.isUserMessage,
-          "order-2 items-start": !message.isUserMessage,
+        className={cn("flex flex-col max-w-[75%] sm:max-w-[65%]", {
+          "items-end": message.isUserMessage,
+          "items-start": !message.isUserMessage,
         })}
       >
+        {/* Message Bubble */}
         <div
-          className={cn("px-4 py-2 rounded-lg inline-block", {
-            "bg-blue-600 text-white": message.isUserMessage,
-            "bg-gray-200 text-gray-900": !message.isUserMessage,
-            "rounded-br-none": !isNextMessageSamePerson && message.isUserMessage,
-            "rounded-bl-none": !isNextMessageSamePerson && !message.isUserMessage,
-          })}
-        >
-          {typeof message.text === "string" ? (
-            <div
-              className={cn("prose", {
-                "text-zinc-50": message.isUserMessage,
-              })}
-            >
-              {/* <ReactMarkdown
-                  // ✅ use explicit `children` prop for type safety
-                  children={message.text}
-                /> */}
-              <ReactMarkdown>{message.text}</ReactMarkdown>
-            </div>
-          ) : (
-            message.text
+          className={cn(
+            "relative px-4 py-2.5 rounded-2xl shadow-sm transition-all duration-200",
+            "group-hover:shadow-md",
+            {
+              "bg-gradient-to-br from-blue-500 to-blue-600 text-white": message.isUserMessage,
+              "bg-white border border-gray-200 text-gray-900": !message.isUserMessage,
+              "rounded-tr-md": !isNextMessageSamePerson && message.isUserMessage,
+              "rounded-tl-md": !isNextMessageSamePerson && !message.isUserMessage,
+            }
           )}
-          {message.id !== "loading-message" ? (
+        >
+          {/* Message Text */}
+          <div
+            className={cn("text-[15px] leading-relaxed", {
+              "text-white": message.isUserMessage,
+              "text-gray-800": !message.isUserMessage,
+            })}
+          >
+            {typeof message.text === "string" ? (
+              <div
+                className={cn("prose prose-sm max-w-none", {
+                  "prose-invert": message.isUserMessage,
+                })}
+              >
+                <ReactMarkdown>{message.text}</ReactMarkdown>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 py-1">
+                <span
+                  className="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "0ms" }}
+                ></span>
+                <span
+                  className="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "150ms" }}
+                ></span>
+                <span
+                  className="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "300ms" }}
+                ></span>
+              </div>
+            )}
+          </div>
+
+          {/* Timestamp */}
+          {message.id !== "loading-message" && (
             <div
-              className={cn("text-xs select-none mt-2 w-full text-right", {
-                "text-zinc-500": !message.isUserMessage,
-                "text-blue-300": message.isUserMessage,
-              })}
+              className={cn(
+                "text-[11px] font-medium mt-1.5 select-none opacity-0 group-hover:opacity-100 transition-opacity duration-200",
+                {
+                  "text-blue-100": message.isUserMessage,
+                  "text-gray-500": !message.isUserMessage,
+                }
+              )}
             >
               {format(new Date(message.createdAt), "HH:mm")}
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </div>
