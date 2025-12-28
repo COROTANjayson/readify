@@ -39,7 +39,6 @@ const rateLimitMiddleware = middleware(async (opts) => {
       throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
     }
   }
-console.log("hello")
   return opts.next();
 });
 
