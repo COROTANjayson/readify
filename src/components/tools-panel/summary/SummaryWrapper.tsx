@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { AlertCircle, Eye, FileText, Loader2, RefreshCw, Sparkles } from "lucide-react";
 
+import { toast } from "sonner";
 import { trpc } from "@/app/_trpc/client";
 import { useFileStore } from "@/app/store/fileStore";
 import { Button } from "@/components/ui/button";
@@ -54,11 +55,16 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
       refetchSummary();
       utils.file.getFileById.invalidate({ fileId });
       router.push(`/editor/${data.id}`);
+      if (data.isNew) {
+        toast.success("Summary generated successfully!");
+      } else {
+        toast.success("Summary regenerated successfully!");
+      }
     },
 
     onError: (error) => {
       console.error("Error generating summary:", error);
-      alert(error instanceof Error ? error.message : "Failed to generate summary");
+      toast.error(error instanceof Error ? error.message : "Failed to generate summary");
     },
   });
 

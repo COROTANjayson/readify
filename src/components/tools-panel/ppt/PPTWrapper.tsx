@@ -14,6 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 
+import { toast } from "sonner";
 import { trpc } from "@/app/_trpc/client";
 import { useFileStore } from "@/app/store/fileStore";
 import { Button } from "@/components/ui/button";
@@ -62,13 +63,23 @@ const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: bo
 
       if (data.isNew && data.downloadUrl) {
         window.location.href = data.downloadUrl;
+        toast.success("Presentation generated successfully!");
+      } else {
+        toast.success("Presentation regenerated successfully!");
       }
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to generate presentation");
     },
   });
 
   const deleteMutation = trpc.presentation.deletePresentation.useMutation({
     onSuccess: () => {
       utils.presentation.getPresentation.invalidate({ fileId });
+      toast.success("Presentation deleted successfully!");
+    },
+    onError: () => {
+      toast.error("Failed to delete presentation");
     },
   });
 
