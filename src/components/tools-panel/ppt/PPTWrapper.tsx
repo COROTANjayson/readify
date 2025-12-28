@@ -23,7 +23,6 @@ import { formatDate } from "@/lib/utils";
 import ToolSectionHeader from "../toolsContent/ToolSectionHeader";
 import ToolsSectionWrapper from "../toolsContent/ToolsSectionWrapper";
 
-// =================== PPT WRAPPER ===================
 interface PresentationResponse {
   id: string;
   fileName: string;
@@ -39,7 +38,6 @@ const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: bo
 
   const { data: presentation, isLoading } = trpc.presentation.getPresentation.useQuery({ fileId });
 
-  // Generate presentation mutation
   const generateMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch("/api/ppt", {
@@ -89,7 +87,6 @@ const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: bo
 
   return (
     <ToolsSectionWrapper>
-      {/* Generation Section */}
       <div className="space-y-5">
         <ToolSectionHeader
           title="Presentation"
@@ -120,18 +117,20 @@ const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: bo
                       </span>
                       <span className="text-xs text-gray-500">{formatDate(new Date(presentation.createdAt))}</span>
                     </div>
-                    <div className="flex items-center justify-end gap-2 flex-shrink-0">
+                    <div className="flex items-center justify-end flex-shrink-0">
                       <Button
+                        variant="ghost"
                         onClick={() => handleDownload(presentation.downloadUrl)}
-                        className="justify-center bg-primary/60  "
+                        className="justify-center hover:bg-transparent text-primary hover:text-primary"
                         title="Download"
                       >
                         <Download className="h-4 w-4 " />
                       </Button>
                       <Button
+                        variant="ghost"
                         onClick={() => handleDelete(presentation.id)}
                         disabled={deleteMutation.isPending}
-                        className=" rounded-lg bg-red-50 text-destructive hover:bg-red-100 transition-colors disabled:opacity-50"
+                        className=" rounded-lg  text-destructive hover:text-destructive disabled:opacity-50 hover:bg-transparent"
                         title="Delete"
                       >
                         {deleteMutation.isPending ? (

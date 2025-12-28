@@ -18,11 +18,14 @@ const ChatInput = ({ isDisabled }: ChatInputProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   return (
-    <div className="absolute bottom-0 left-0 w-full ">
+    <div className="absolute bottom-0 left-0 w-full bg-zinc-50 border-t">
       <div className="mx-2 flex flex-row gap-3 md:mx-4 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
         <div className="relative flex h-full flex-1 items-stretch md:flex-col">
        
           <div className="relative flex flex-col w-full flex-grow p-4">
+            <div className="mb-3">
+              <ToolsUsageInfo type="chat" />
+            </div>
             <div className="relative">
               <Textarea
                 rows={1}
@@ -58,9 +61,7 @@ const ChatInput = ({ isDisabled }: ChatInputProps) => {
               </Button>
             </div>
             
-            <div className="mt-3">
-              <ToolsUsageInfo type="chat" />
-            </div>
+            
           </div>
         </div>
       </div>

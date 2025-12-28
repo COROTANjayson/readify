@@ -73,7 +73,6 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
 
   return (
     <ToolsSectionWrapper>
-      {/* Header (always the same) */}
       <ToolSectionHeader
         title="Generate Summary"
         description="Create an AI-powered summary of your document"
@@ -83,7 +82,6 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
       <div className="space-y-5">
         {existingSummary ? (
           <>
-            {/* Existing summary card */}
             <div className="relative overflow-hidden rounded-md border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5">
               <div className="flex gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-md bg-emerald-500 shadow-sm">
@@ -106,7 +104,6 @@ const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed
               </div>
             </div>
 
-            {/* Actions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button onClick={() => router.push(`/editor/${existingSummary.id}`)} className="gap-2 px-4 py-6">
                 <Eye className="h-4 w-4" />
