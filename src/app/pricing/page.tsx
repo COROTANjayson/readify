@@ -1,195 +1,173 @@
-import Link from "next/link";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { ArrowRight, Check, HelpCircle, Minus } from "lucide-react";
+import React from "react";
+import { AlertCircle, ArrowRight, Check, Shield, Sparkles, X, Zap } from "lucide-react";
 
-import UpgradeButton from "@/components/billing/UpgradeButton";
-import MaxWidthWrapper from "@/components/general/MaxWidthWrapper";
-import { buttonVariants } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { PLANS } from "@/config/stripe";
-import { cn } from "@/lib/utils";
-
-const Page = async () => {
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
-
-  const pricingItems = [
+const PricingPage = () => {
+  const plans = [
     {
-      plan: "Free",
-      tagline: "For small side projects.",
+      name: "Free",
+      tagline: "Perfect for getting started",
+      price: 0,
       quota: 10,
+      popular: false,
       features: [
-        {
-          text: "5 pages per PDF",
-          footnote: "The maximum amount of pages per PDF-file.",
-        },
-        {
-          text: "4MB file size limit",
-          footnote: "The maximum file size of a single PDF file.",
-        },
-        {
-          text: "Mobile-friendly interface",
-        },
-        {
-          text: "Higher-quality responses",
-          footnote: "Better algorithmic responses for enhanced content quality",
-          negative: true,
-        },
-        {
-          text: "Priority support",
-          negative: true,
-        },
+        { text: "5 pages per PDF", included: true },
+        { text: "4MB file size limit", included: true },
+        { text: "Mobile-friendly interface", included: true },
+        { text: "Higher-quality responses", included: false },
+        { text: "Priority support", included: false },
       ],
+      gradient: "from-gray-50 to-gray-100",
+      buttonStyle: "bg-gray-900 hover:bg-gray-800 text-white",
     },
     {
-      plan: "Pro",
-      tagline: "For larger projects with higher needs.",
-      quota: PLANS.find((p) => p.slug === "pro")!.quota,
+      name: "Pro",
+      tagline: "For power users & professionals",
+      price: 9.99,
+      quota: 50,
+      popular: true,
       features: [
-        {
-          text: "25 pages per PDF",
-          footnote: "The maximum amount of pages per PDF-file.",
-        },
-        {
-          text: "16MB file size limit",
-          footnote: "The maximum file size of a single PDF file.",
-        },
-        {
-          text: "Mobile-friendly interface",
-        },
-        {
-          text: "Higher-quality responses",
-          footnote: "Better algorithmic responses for enhanced content quality",
-        },
-        {
-          text: "Priority support",
-        },
+        { text: "25 pages per PDF", included: true },
+        { text: "16MB file size limit", included: true },
+        { text: "Mobile-friendly interface", included: true },
+        { text: "Higher-quality responses", included: true },
+        { text: "Priority support", included: true },
       ],
+      gradient: "from-blue-50 to-indigo-100",
+      buttonStyle: "bg-gradient-to-r from-primary to-indigo-600 hover:from-primary hover:to-indigo-700 text-white",
     },
   ];
 
   return (
-    <>
-      <MaxWidthWrapper className="mb-8 mt-24 text-center max-w-5xl">
-        <div className="mx-auto mb-10 sm:max-w-lg">
-          <h1 className="text-6xl font-bold sm:text-7xl">Pricing</h1>
-          <p className="mt-5 text-gray-600 sm:text-lg">
-            Whether you&apos;re just trying out our service or need more, we&apos;ve got you covered.
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Disclaimer Banner */}
+      <div className="bg-amber-500 text-white py-3 px-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-sm md:text-base font-medium">
+          <AlertCircle className="h-5 w-5 flex-shrink-0" />
+          <p className="text-center">
+            <span className="font-bold">TEST PAGE ONLY</span> - Payment functionality is not available. This is for
+            demonstration purposes.
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-secondary text-primary px-4 py-2 rounded-full text-sm font-semibold mb-6">
+            <Sparkles className="h-4 w-4" />
+            Simple, Transparent Pricing
+          </div>
+
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+            Choose Your
+            <span className="bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+              {" "}
+              Perfect Plan
+            </span>
+          </h1>
+
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Start free and scale as you grow. No hidden fees, cancel anytime.
           </p>
         </div>
 
-        <div className="pt-12 grid grid-cols-1 gap-10 lg:grid-cols-2">
-          <TooltipProvider>
-            {pricingItems.map(({ plan, tagline, quota, features }) => {
-              const price = PLANS.find((p) => p.slug === plan.toLowerCase())?.price.amount || 0;
+        {/* Pricing Cards */}
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto mb-16">
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`relative rounded-3xl shadow-xl overflow-hidden transition-all duration-300 hover:scale-105 ${
+                plan.popular ? "ring-4 ring-primary ring-offset-4" : ""
+              }`}
+            >
+              {plan.popular && (
+                <div className="absolute top-0 right-0 bg-gradient-to-r from-primary to-indigo-600 text-white px-6 py-2 rounded-bl-3xl font-semibold text-sm flex items-center gap-1.5 shadow-lg">
+                  <Zap className="h-4 w-4" />
+                  Most Popular
+                </div>
+              )}
 
-              return (
-                <div
-                  key={plan}
-                  className={cn("relative rounded-2xl bg-white shadow-lg", {
-                    "border-2 border-blue-600 shadow-blue-200": plan === "Pro",
-                    "border border-gray-200": plan !== "Pro",
-                  })}
-                >
-                  {plan === "Pro" && (
-                    <div className="absolute -top-5 left-0 right-0 mx-auto w-32 rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 px-3 py-2 text-sm font-medium text-white">
-                      Upgrade now
-                    </div>
+              <div className={`bg-gradient-to-br ${plan.gradient} p-8 md:p-10`}>
+                <div className="flex items-center gap-3 mb-3">
+                  {plan.name === "Pro" ? (
+                    <Shield className="h-8 w-8 text-primary" />
+                  ) : (
+                    <Sparkles className="h-8 w-8 text-gray-600" />
                   )}
+                  <h2 className="text-3xl font-bold text-gray-900">{plan.name}</h2>
+                </div>
 
-                  <div className="p-5">
-                    <h3 className="my-3 text-center font-display text-3xl font-bold">{plan}</h3>
-                    <p className="text-gray-500">{tagline}</p>
-                    <p className="my-5 font-display text-6xl font-semibold">${price}</p>
-                    <p className="text-gray-500">per month</p>
-                  </div>
+                <p className="text-gray-600 mb-6 text-lg">{plan.tagline}</p>
 
-                  <div className="flex h-20 items-center justify-center border-b border-t border-gray-200 bg-gray-50">
-                    <div className="flex items-center space-x-1">
-                      <p>{quota.toLocaleString()} PDFs/mo included</p>
-
-                      <Tooltip delayDuration={300}>
-                        <TooltipTrigger className="cursor-default ml-1.5">
-                          <HelpCircle className="h-4 w-4 text-zinc-500" />
-                        </TooltipTrigger>
-                        <TooltipContent className="w-80 p-2">How many PDFs you can upload per month.</TooltipContent>
-                      </Tooltip>
-                    </div>
-                  </div>
-
-                  <ul className="my-10 space-y-5 px-8">
-                    {features.map(({ text, footnote, negative }) => (
-                      <li key={text} className="flex space-x-5">
-                        <div className="flex-shrink-0">
-                          {negative ? (
-                            <Minus className="h-6 w-6 text-gray-300" />
-                          ) : (
-                            <Check className="h-6 w-6 text-blue-500" />
-                          )}
-                        </div>
-                        {footnote ? (
-                          <div className="flex items-center space-x-1">
-                            <p
-                              className={cn("text-gray-600", {
-                                "text-gray-400": negative,
-                              })}
-                            >
-                              {text}
-                            </p>
-                            <Tooltip delayDuration={300}>
-                              <TooltipTrigger className="cursor-default ml-1.5">
-                                <HelpCircle className="h-4 w-4 text-zinc-500" />
-                              </TooltipTrigger>
-                              <TooltipContent className="w-80 p-2">{footnote}</TooltipContent>
-                            </Tooltip>
-                          </div>
-                        ) : (
-                          <p
-                            className={cn("text-gray-600", {
-                              "text-gray-400": negative,
-                            })}
-                          >
-                            {text}
-                          </p>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="border-t border-gray-200" />
-                  <div className="p-5">
-                    {plan === "Free" ? (
-                      <Link
-                        href={user ? "/dashboard" : "/sign-in"}
-                        className={buttonVariants({
-                          className: "w-full",
-                          variant: "secondary",
-                        })}
-                      >
-                        {user ? "Upgrade now" : "Sign up"}
-                        <ArrowRight className="h-5 w-5 ml-1.5" />
-                      </Link>
-                    ) : user ? (
-                      <UpgradeButton />
-                    ) : (
-                      <Link
-                        href="/sign-in"
-                        className={buttonVariants({
-                          className: "w-full",
-                        })}
-                      >
-                        {user ? "Upgrade now" : "Sign up"}
-                        <ArrowRight className="h-5 w-5 ml-1.5" />
-                      </Link>
-                    )}
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-6xl font-bold text-gray-900">${plan.price}</span>
+                    <span className="text-xl text-gray-500">/month</span>
                   </div>
                 </div>
-              );
-            })}
-          </TooltipProvider>
+
+                <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-3 rounded-xl mb-8 shadow-sm border border-gray-200">
+                  <span className="font-semibold text-gray-900">{plan.quota} PDFs</span>
+                  <span className="text-gray-500">per month</span>
+                </div>
+
+                <button
+                  className={`w-full ${plan.buttonStyle} px-8 py-4 rounded-xl font-semibold text-lg shadow-lg transition-all duration-200 flex items-center justify-center gap-2 group`}
+                  disabled
+                >
+                  Get Started
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+
+                <div className="mt-8 space-y-4">
+                  <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+                    What's Included
+                  </div>
+                  {plan.features.map((feature, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <div
+                        className={`flex-shrink-0 rounded-full p-1 ${
+                          feature.included ? "bg-green-100 text-green-600" : "bg-gray-200 text-gray-400"
+                        }`}
+                      >
+                        {feature.included ? <Check className="h-5 w-5" /> : <X className="h-5 w-5" />}
+                      </div>
+                      <span className={`text-base ${feature.included ? "text-gray-700" : "text-gray-400"}`}>
+                        {feature.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-      </MaxWidthWrapper>
-    </>
+
+        {/* Bottom Disclaimer */}
+        <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 max-w-3xl mx-auto">
+          <div className="flex items-start gap-4">
+            <AlertCircle className="h-6 w-6 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-bold text-amber-900 text-lg mb-2">Important Notice</h3>
+              <p className="text-amber-800 leading-relaxed">
+                This is a demonstration page only. Payment processing is not configured and buttons are non-functional.
+                This interface is designed to showcase the pricing structure and feature comparison.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Trust Indicators */}
+        <div className="mt-16 text-center">
+          <p className="text-gray-500 mb-4">Trusted by developers worldwide</p>
+          <div className="flex justify-center items-center gap-8 flex-wrap opacity-50">
+            <div className="text-gray-400 font-semibold">🚀 Fast & Reliable</div>
+            <div className="text-gray-400 font-semibold">🔒 Secure</div>
+            <div className="text-gray-400 font-semibold">💯 Money Back Guarantee</div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default Page;
+export default PricingPage;
