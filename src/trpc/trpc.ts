@@ -1,5 +1,6 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
+
 // import superjson from "superjson";
 // Avoid exporting the entire t-object
 // since it's not very descriptive.

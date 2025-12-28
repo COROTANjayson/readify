@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 
 import { tools } from "@/lib/config/tools";
@@ -98,7 +98,6 @@ const ToolsSelection: React.FC = () => {
 
   return (
     <div ref={panelRef}>
-    
       <div
         className={`
           hidden md:block fixed right-0 top-14 bottom-0 w-80 bg-white border-l shadow-2xl z-50

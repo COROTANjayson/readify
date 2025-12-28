@@ -38,7 +38,7 @@ const Dashboard = ({ subscriptionPlan }: PageProps) => {
       <div className="mx-auto max-w-7xl px-4 py-8 md:px-10 md:py-12">
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-800   to-primary p-6 shadow-xl md:p-8">
           <div className="absolute inset-0 bg-black/10"></div>
-    
+
           <div className="relative flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-white/20 p-2 backdrop-blur-sm">

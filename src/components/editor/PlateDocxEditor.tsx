@@ -12,11 +12,7 @@ import {
   ItalicPlugin,
   UnderlinePlugin,
 } from "@platejs/basic-nodes/react";
-import {
-  BulletedListPlugin,
-  ListPlugin,
-  NumberedListPlugin,
-} from "@platejs/list-classic/react";
+import { BulletedListPlugin, ListPlugin, NumberedListPlugin } from "@platejs/list-classic/react";
 import htmlDocx from "html-docx-js/dist/html-docx";
 import * as mammoth from "mammoth";
 import type { Value } from "platejs";

@@ -39,7 +39,7 @@ export const FileCard: React.FC<FileCardProps> = ({ file, onDelete, isDeleting, 
           <span className="font-medium text-gray-700">{totalActions}</span> total actions
         </div>
         <Button
-         variant="ghost"
+          variant="ghost"
           onClick={(e) => {
             e.stopPropagation();
             onDelete(file.id);

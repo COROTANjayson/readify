@@ -21,7 +21,6 @@ const Page = async ({ params }: PageProps) => {
     redirect(`/auth-callback?origin=dashboard/${fileid}`);
   }
 
-
   const trpc = await createCaller();
   const file = await trpc.file.getFileById({ fileId: fileid });
 

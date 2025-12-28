@@ -14,7 +14,7 @@ const ToolsContent = ({ file, isSubscribed }: { file: FileOutput; isSubscribed: 
   const setFile = useFileStore((state) => state.setFile);
 
   useEffect(() => {
-    console.log("file updated in tools content")
+    console.log("file updated in tools content");
     setFile(file);
   }, [file, setFile]);
 

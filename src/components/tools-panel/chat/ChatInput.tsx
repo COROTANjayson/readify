@@ -5,8 +5,8 @@ import { Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ChatContext } from "./ChatContent";
 import ToolsUsageInfo from "../toolsContent/ToolsUsageInfo";
+import { ChatContext } from "./ChatContent";
 
 interface ChatInputProps {
   isDisabled?: boolean;
@@ -21,7 +21,6 @@ const ChatInput = ({ isDisabled }: ChatInputProps) => {
     <div className="absolute bottom-0 left-0 w-full bg-zinc-50 border-t">
       <div className="mx-2 flex flex-row gap-3 md:mx-4 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
         <div className="relative flex h-full flex-1 items-stretch md:flex-col">
-       
           <div className="relative flex flex-col w-full flex-grow p-4">
             <div className="mb-3">
               <ToolsUsageInfo type="chat" />
@@ -60,8 +59,6 @@ const ChatInput = ({ isDisabled }: ChatInputProps) => {
                 <Send className="h-4 w-4" />
               </Button>
             </div>
-            
-            
           </div>
         </div>
       </div>
