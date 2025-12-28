@@ -7,6 +7,7 @@ import { streamText } from "ai";
 
 import { db } from "@/db";
 import { getPineconeClient } from "@/lib/pinecone";
+import { rateLimit } from "@/lib/rate-limit";
 import { reserveUsage, UsageLimitError } from "@/lib/tools/usageGuard";
 import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
 
@@ -20,6 +21,11 @@ export const POST = async (req: NextRequest) => {
 
     if (!user?.id) {
       return new Response("Unauthorized", { status: 401 });
+    }
+
+    const { success } = await rateLimit.limit(user.id);
+    if (!success) {
+      return new Response("Too many requests", { status: 429 });
     }
 
     const { id: userId } = user;

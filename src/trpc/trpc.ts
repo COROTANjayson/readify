@@ -1,6 +1,8 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 
+import { rateLimit } from "@/lib/rate-limit";
+
 // import superjson from "superjson";
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
@@ -27,7 +29,21 @@ const isAuth = middleware(async (opts) => {
   });
 });
 
+const rateLimitMiddleware = middleware(async (opts) => {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
+  if (user && user.id) {
+    const { success } = await rateLimit.limit(user.id);
+    if (!success) {
+      throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
+    }
+  }
+console.log("hello")
+  return opts.next();
+});
+
 // Base router and procedure helpers
 export const router = t.router;
 export const publicProcedure = t.procedure;
-export const privateProcedure = t.procedure.use(isAuth);
+export const privateProcedure = t.procedure.use(isAuth).use(rateLimitMiddleware);

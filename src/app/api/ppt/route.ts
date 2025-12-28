@@ -9,6 +9,7 @@ import PptxGenJS from "pptxgenjs";
 
 import { db } from "@/db";
 import { getPineconeClient } from "@/lib/pinecone";
+import { rateLimit } from "@/lib/rate-limit";
 import { reserveUsage, UsageLimitError } from "@/lib/tools/usageGuard";
 
 export const POST = async (req: NextRequest) => {
@@ -21,6 +22,11 @@ export const POST = async (req: NextRequest) => {
 
     if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { success } = await rateLimit.limit(user.id);
+    if (!success) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
     const { fileId, slideCount = 5 } = body;

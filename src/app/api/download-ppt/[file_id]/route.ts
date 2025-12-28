@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 import { db } from "@/db";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const GET = async (req: NextRequest, { params }: { params: { fileId: string } }) => {
   try {
@@ -11,6 +12,11 @@ export const GET = async (req: NextRequest, { params }: { params: { fileId: stri
 
     if (!user || !user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { success } = await rateLimit.limit(user.id);
+    if (!success) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
     const { fileId } = params;
