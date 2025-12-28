@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { X } from "lucide-react";
 
 import { tools } from "@/lib/config/tools";
@@ -27,7 +27,7 @@ const ToolButton = ({ tool, selectedTools, onSelect }: any) => (
 
 const DesktopContent = ({ onClose, selectedTools, handleToolsSelect }: any) => (
   <>
-    <div className="flex items-center justify-between p-4 border-b">
+    <div className="flex items-center justify-between p-4 border-b  h-[80px]">
       <h2 className="text-lg font-semibold">Select Tools</h2>
       <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
         <X className="w-5 h-5" />
@@ -63,6 +63,7 @@ const ToolsSelection: React.FC = () => {
   const { isToolsMenuOpen, setIsToolsMenuOpen, selectedTools, handleToolsSelect } = useContext(ToolsContext);
 
   const [shouldRender, setShouldRender] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isToolsMenuOpen) {
@@ -73,11 +74,31 @@ const ToolsSelection: React.FC = () => {
     }
   }, [isToolsMenuOpen]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (panelRef.current && panelRef.current.contains(event.target as Node)) {
+        return;
+      }
+      if ((event.target as Element).closest("#tools-panel-trigger")) {
+        return;
+      }
+      setIsToolsMenuOpen(false);
+    };
+
+    if (isToolsMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isToolsMenuOpen, setIsToolsMenuOpen]);
+
   if (!shouldRender) return null;
 
   return (
-    <>
-      {/* DESKTOP PANEL (slides from right) */}
+    <div ref={panelRef}>
+    
       <div
         className={`
           hidden md:block fixed right-0 top-14 bottom-0 w-80 bg-white border-l shadow-2xl z-50
@@ -145,7 +166,7 @@ const ToolsSelection: React.FC = () => {
           animation: slide-down 0.3s ease-in forwards;
         }
       `}</style>
-    </>
+    </div>
   );
 };
 
