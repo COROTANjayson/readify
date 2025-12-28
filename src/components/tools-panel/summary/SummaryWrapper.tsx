@@ -22,6 +22,7 @@ interface SummaryResponse {
 }
 
 const SummaryWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: boolean }) => {
+  console.log(isSubscribed);
   const router = useRouter();
   const [regenerate, setRegenerate] = useState(false);
   const utils = trpc.useUtils();

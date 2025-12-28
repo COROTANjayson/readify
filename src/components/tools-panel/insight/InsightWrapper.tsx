@@ -7,7 +7,6 @@ import { useFileStore } from "@/app/store/fileStore";
 import { Button } from "@/components/ui/button";
 import ToolSectionHeader from "../toolsContent/ToolSectionHeader";
 import ToolsSectionWrapper from "../toolsContent/ToolsSectionWrapper";
-import ToolsUsageInfo from "../toolsContent/ToolsUsageInfo";
 
 interface InsightWrapperProps {
   fileId: string;

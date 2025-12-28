@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, FileCheck, FileText, Loader2, MessageSquare, MoreVertical, Trash2, TrendingUp } from "lucide-react";
+import { Calendar, Loader2, Trash2 } from "lucide-react";
 
 import { formatDate } from "@/lib/utils";
 import { FileOutput } from "@/types/file";

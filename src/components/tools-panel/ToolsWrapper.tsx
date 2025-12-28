@@ -1,9 +1,8 @@
 "use client";
 
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 
 import { trpc } from "@/app/_trpc/client";
-import { useFileStore } from "@/app/store/fileStore";
 import { FileOutput } from "@/types/file";
 import ToolsContent from "./ToolsContent";
 import { ToolsContext, ToolsContextProvider } from "./ToolsContext";

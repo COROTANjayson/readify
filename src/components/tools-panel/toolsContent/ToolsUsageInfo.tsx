@@ -2,7 +2,6 @@ import { AlertCircle, Eye, FileText, Sparkles } from "lucide-react";
 
 import { useFileStore } from "@/app/store/fileStore";
 import { IconTooltip } from "@/components/ui/icon-tooltip";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // =================== TOOLS USAGE INFO ===================
 export type ToolKey = "chat" | "summarize" | "insight" | "presentation";
