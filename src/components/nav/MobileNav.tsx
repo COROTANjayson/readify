@@ -11,7 +11,6 @@ const MobileNav = ({ isAuth }: { isAuth: boolean }) => {
 
   const toggleOpen = () => setOpen((prev) => !prev);
 
-  // Close mobile nav on route change
   useEffect(() => {
     setOpen(false);
   }, [pathname]);

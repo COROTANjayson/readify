@@ -19,7 +19,6 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(({ message, isNextMessa
         "flex-row-reverse": message.isUserMessage,
       })}
     >
-      {/* Avatar */}
       <div
         className={cn(
           "flex-shrink-0 flex items-center justify-center transition-opacity duration-200",

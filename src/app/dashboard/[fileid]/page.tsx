@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
-import PDFWrapper from "@/components/PdfWrapper";
+import PDFWrapper from "@/components/pdf/PdfWrapper";
 import ToolsWrapper from "@/components/tools-panel/ToolsWrapper";
 import { createCaller } from "@/trpc/server";
 

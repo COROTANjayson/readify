@@ -15,10 +15,10 @@ import { toast } from "sonner";
 import { z } from "zod/v3";
 
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Input } from "../ui/input";
 import PdfFullscreen from "./PdfFUllScreen";
-import { Button } from "./ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { Input } from "./ui/input";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -48,8 +48,6 @@ const PdfRenderer = ({ url }: { url: string }) => {
     },
     resolver: zodResolver(CustomPageValidator),
   });
-
-  // console.log(errors)
 
   const { width, ref } = useResizeDetector();
 

@@ -3,7 +3,7 @@ import { Calendar, Loader2, Trash2 } from "lucide-react";
 
 import { formatDate } from "@/lib/utils";
 import { FileOutput } from "@/types/file";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 // FileCard Component
 interface FileCardProps {

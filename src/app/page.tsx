@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MessageSquare, Upload, Zap } from "lucide-react";
 
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import MaxWidthWrapper from "@/components/general/MaxWidthWrapper";
 import { buttonVariants } from "@/components/ui/button";
 
 export default function Home() {
@@ -10,7 +10,6 @@ export default function Home() {
     <>
       <MaxWidthWrapper className="mb-12 mt-28 sm:mt-40">
         <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12">
-          {/* Text Content */}
           <div className="flex flex-col items-center justify-center text-center lg:flex-1 lg:items-start lg:text-left">
             <h1
               className="mx-auto lg:mx-0 max-w-4xl font-semibold leading-tight 

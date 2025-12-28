@@ -3,13 +3,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 
-import Navbar from "@/components/Navbar";
-import Providers from "@/components/Providers";
+import Providers from "@/components/general/Providers";
 import { cn, constructMetadata } from "@/lib/utils";
 
 import "react-loading-skeleton/dist/skeleton.css";
 import "simplebar-react/dist/simplebar.min.css";
 
+import Navbar from "@/components/nav/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({

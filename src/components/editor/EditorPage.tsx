@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import type { Value } from "platejs";
 
 import { trpc } from "@/app/_trpc/client";
-import { StateDisplay } from "../StateDisplay";
+import { StateDisplay } from "../general/StateDisplay";
 import { EditorHeader } from "./EditorHeader";
 import { PlateEditor } from "./PlateEditor";
 

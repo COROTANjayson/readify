@@ -145,11 +145,9 @@ const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: bo
             )}
           </div>
         )}
-        {/* Configuration Card */}
         <div className="rounded-md border border-gray-200 bg-card  p-5 space-y-4">
           <div className="flex gap-3">
             <div className="space-y-4 flex-1">
-              {/* Slide Count Input */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-900 flex items-center justify-between">
                   <span className="flex items-center gap-2">
@@ -215,7 +213,6 @@ const PPTWrapper = ({ fileId, isSubscribed }: { fileId: string; isSubscribed: bo
           </div>
         )}
 
-        {/* Action Buttons */}
         <div className="space-y-3">
           <Button
             onClick={() => generateMutation.mutate()}

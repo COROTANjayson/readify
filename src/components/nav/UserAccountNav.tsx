@@ -4,16 +4,16 @@ import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/server";
 import { Gem } from "lucide-react";
 
 import { getUserSubscriptionPlan } from "@/lib/stripe";
-import { Icons } from "./Icons";
-import { Avatar, AvatarFallback } from "./ui/avatar";
-import { Button } from "./ui/button";
+import { Icons } from "../general/Icons";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 
 interface UserAccountNavProps {
   email: string | undefined;

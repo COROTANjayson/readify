@@ -2,9 +2,9 @@ import Link from "next/link";
 import { getKindeServerSession, LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/server";
 import { ArrowRight } from "lucide-react";
 
-import MaxWidthWrapper from "./MaxWidthWrapper";
+import MaxWidthWrapper from "../general/MaxWidthWrapper";
+import { buttonVariants } from "../ui/button";
 import MobileNav from "./MobileNav";
-import { buttonVariants } from "./ui/button";
 import UserAccountNav from "./UserAccountNav";
 
 const Navbar = async () => {

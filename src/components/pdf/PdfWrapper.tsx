@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 
-// Dynamically import PDFViewer, with SSR disabled
 const PdfRenderer = dynamic(() => import("./PdfRenderer"), {
   ssr: false,
 });

@@ -6,9 +6,9 @@ import { toast } from "sonner";
 
 import { trpc } from "@/app/_trpc/client";
 import { getUserSubscriptionPlan } from "@/lib/stripe";
-import MaxWidthWrapper from "./MaxWidthWrapper";
-import { Button } from "./ui/button";
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import MaxWidthWrapper from "../general/MaxWidthWrapper";
+import { Button } from "../ui/button";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 
 interface BillingFormProps {
   subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>;

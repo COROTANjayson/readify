@@ -2,10 +2,10 @@ import Link from "next/link";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { ArrowRight, Check, HelpCircle, Minus } from "lucide-react";
 
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import UpgradeButton from "@/components/billing/UpgradeButton";
+import MaxWidthWrapper from "@/components/general/MaxWidthWrapper";
 import { buttonVariants } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import UpgradeButton from "@/components/UpgradeButton";
 import { PLANS } from "@/config/stripe";
 import { cn } from "@/lib/utils";
 

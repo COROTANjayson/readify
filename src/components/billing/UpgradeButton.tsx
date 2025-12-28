@@ -3,10 +3,10 @@
 import { ArrowRight } from "lucide-react";
 
 import { trpc } from "@/app/_trpc/client";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 const UpgradeButton = () => {
-  const { mutate: createStripeSession } = trpc.createStripeSession.useMutation({
+  const { mutate: createStripeSession } = trpc.billing.createStripeSession.useMutation({
     onSuccess: ({ url }) => {
       window.location.href = url ?? "/dashboard/billing";
     },

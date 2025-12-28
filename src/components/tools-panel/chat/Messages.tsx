@@ -73,7 +73,6 @@ const Messages = ({ fileId }: MessagesProps) => {
     );
   }
 
-  // Messages list
   return (
     <div className="pb-36 scrollbar-thumb-blue scrollbar-track-blue-lighter scrollbar-thumb-rounded scrolling-touch scrollbar-w-2 flex max-h-[calc(100vh-3.5rem-5.5rem)] flex-1 flex-col-reverse gap-4 overflow-y-auto border-zinc-200 p-3">
       {combinedMessages.map((message, i) => {

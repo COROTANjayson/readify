@@ -1,15 +1,7 @@
-// import ChatWrapper from '@/components/chat/ChatWrapper'
-// import PdfRenderer from '@/components/PdfRenderer'
 import { redirect } from "next/navigation";
-// import { getUserSubscriptionPlan } from '@/lib/stripe'
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
-// import MyEditorPage from "@/components/editor/PlateDocxEditor";
 import MyEditorPage from "@/components/editor/EditorPage";
-
-// import AppHello from "@/components/tools-panel/test";
-// import PdfRenderer from "@/components/PdfRenderer";
-// import { db } from "@/db";
 
 interface PageProps {
   params: {
@@ -27,7 +19,6 @@ const Page = async ({ params }: PageProps) => {
   if (!user || !user.id) redirect(`/auth-callback?origin=dashboard`);
 
   return <MyEditorPage doc_id={doc_id} />;
-  // return <AppHello />;
 };
 
 export default Page;

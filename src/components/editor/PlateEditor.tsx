@@ -1,6 +1,5 @@
 "use client";
 
-// import { useRouter } from "next/router";
 import {
   BlockquotePlugin,
   BoldPlugin,
@@ -34,7 +33,6 @@ export function PlateEditor({
 }) {
   const editor = usePlateEditor({
     plugins: [
-      // BasicNodesPlugin,
       BoldPlugin,
       ItalicPlugin,
       UnderlinePlugin,

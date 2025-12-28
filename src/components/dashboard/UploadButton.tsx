@@ -12,9 +12,9 @@ import { toast } from "sonner";
 // import { useToast } from './ui/use-toast'
 import { trpc } from "@/app/_trpc/client";
 import { useUploadThing } from "@/lib/uploadthing";
-import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogTrigger } from "./ui/dialog";
-import { Progress } from "./ui/progress";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTrigger } from "../ui/dialog";
+import { Progress } from "../ui/progress";
 
 const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
   const router = useRouter();

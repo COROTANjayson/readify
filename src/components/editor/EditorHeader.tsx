@@ -3,7 +3,6 @@ import { ArrowLeft, Loader2, Save, Trash2 } from "lucide-react";
 
 import { Button } from "../ui/button";
 
-// Header Component
 export const EditorHeader = ({
   fileName,
   onSave,
