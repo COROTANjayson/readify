@@ -5,7 +5,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { db } from "@/db";
 import { rateLimit } from "@/lib/rate-limit";
 
-export const GET = async (req: NextRequest, { params }: { params: { fileId: string } }) => {
+export const GET = async (req: NextRequest, { params }: { params: Promise<{ file_id: string }> }) => {
   try {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
@@ -19,12 +19,12 @@ export const GET = async (req: NextRequest, { params }: { params: { fileId: stri
       return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    const { fileId } = params;
+    const { file_id } = await params;
 
     // Get the latest presentation for this file
     const presentation = await db.presentation.findFirst({
       where: {
-        fileId,
+        fileId: file_id,
         userId: user.id,
       },
       orderBy: {
