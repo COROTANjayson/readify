@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 import { db } from "@/db";
 import { rateLimit } from "@/lib/rate-limit";
 
@@ -16,9 +17,6 @@ export async function GET() {
     return NextResponse.json({ status: "ok" });
   } catch (error) {
     console.error("Keep-alive cron failed:", error);
-    return NextResponse.json(
-      { status: "error", message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ status: "error", message: "Internal Server Error" }, { status: 500 });
   }
 }

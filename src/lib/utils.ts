@@ -11,8 +11,8 @@ export function absoluteUrl(path: string) {
   return `http://localhost:${process.env.PORT ?? 3000}${path}`;
 }
 export function constructMetadata({
-  title = "SummarAize - the SaaS for students",
-  description = "summarAIze is an open-source software to make chatting to your PDF files easy.",
+  title = "SummarAIze — The AI Study Workspace for Students",
+  description = "SummarAIze is an open-source AI workspace that helps students analyze, summarize, and extract insights from PDFs, lectures, and study materials ",
   image = "/thumbnail.png",
   icons = "/favicon.ico",
   noIndex = false,

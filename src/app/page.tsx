@@ -52,12 +52,12 @@ export default function Home() {
           <div className="mt-16 lg:mt-0 lg:flex-1">
             <div className="-m-2 rounded-xl bg-gradient-to-br from-primary/5 to-secondary/5 p-2 ring-1 ring-inset ring-primary/10 lg:-m-4 lg:rounded-2xl lg:p-4 shadow-2xl hover:shadow-3xl transition-all duration-300">
               <Image
-                src="/dashboard-preview.jpg"
+                src="/dashboard-preview.png"
                 alt="product preview"
                 width={1364}
                 height={866}
                 quality={100}
-                className="rounded-md bg-background p-2 sm:p-8 md:p-20 shadow-2xl ring-1 ring-border/50"
+                className="object-cover rounded-md bg-background p-2 sm:p-8  shadow-2xl ring-1 ring-border/50"
               />
             </div>
           </div>
@@ -127,12 +127,12 @@ export default function Home() {
             <div className="mt-16 flow-root sm:mt-24">
               <div className="-m-2 rounded-xl bg-gradient-to-br from-primary/5 to-secondary/5 p-2 ring-1 ring-inset ring-primary/10 lg:-m-4 lg:rounded-2xl lg:p-4 shadow-2xl hover:shadow-3xl transition-all duration-300">
                 <Image
-                  src="/file-upload-preview.jpg"
+                  src="/file-upload-preview.png"
                   alt="uploading preview"
                   width={1419}
                   height={732}
                   quality={100}
-                  className="rounded-md bg-background p-2 sm:p-8 md:p-20 shadow-2xl ring-1 ring-border/50"
+                  className="object-cover rounded-md bg-background  shadow-2xl ring-1 ring-border/50"
                 />
               </div>
             </div>
